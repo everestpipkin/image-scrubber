@@ -66,6 +66,10 @@
 <div id="blurAmountDiv" class="topBarDiv"><center> Blur Radius<br>
   <input type="range" min="20" max="130" value="75" class="slider" id="blurAmount"></center>
 </div>
+
+<div id="zoomScaleDiv" class="topBarDiv"><center> Zoom<br>
+  <input type="range" min="100" max="200" value="100" class="slider" id="zoomScale"></center>
+</div>
 </div>
 
 <button id="about">About</button>
@@ -99,11 +103,13 @@ If you want other ways to cover your digital footprint, I've assembled a list of
 </div>
 
     <div id="exifInformationHolder"></div>
+    <div id="imageContainer">
     <canvas id="imageCanvas"></canvas>
     <canvas id="tempCanvas"></canvas>
     <canvas id="holderCanvas"></canvas>
     <canvas id="rotationCanvas"></canvas>
     <canvas id="blurredCanvas"></canvas>
+    </div>
 
     <script type="text/javascript" src="scripts/exif.js"></script>
     <script type="text/javascript" src="scripts/stackblur.js"></script>
@@ -133,6 +139,7 @@ var blurredCtx = blurredCanvas.getContext("2d");
 
 var brushSize = 50;
 var blurAmount = 50;
+var zoomScale = 1;
 
 //blur amount needs to be set for the size of the canvas ...
 //100 x 100 is arond 5, 2500 x 2500 is around 100
@@ -162,6 +169,9 @@ brushSizeDiv.onchange = populateBrushSize;
 var blurAmountDiv = document.getElementById("blurAmount");
 blurAmountDiv.onchange = populateBlurAmount;
 
+var zoomScaleDiv = document.getElementById("zoomScale");
+zoomScaleDiv.oninput = setZoom;
+
 function populateBrushSize(){
     brushSize = Math.floor(this.value * canvas.width/800);
     setCursor();
@@ -171,13 +181,18 @@ function populateBlurAmount(){
     blurAmount = Math.floor(this.value);
 }
 
+function setZoom() {
+    zoomScale = this.value / 100;
+    canvas.style.transform = "scale(" + zoomScale + ")";
+    setCursor();
+}
 
 function setCursor(){
 
     var cursorCanvas = document.createElement('canvas');
     var scaleX = canvas.getBoundingClientRect().width / canvas.width;
-    cursorCanvas.width = ((brushSize*2)*scaleX);
-    cursorCanvas.height = ((brushSize*2)*scaleX);
+    cursorCanvas.width = ((brushSize*2)*scaleX*zoomScale);
+    cursorCanvas.height = ((brushSize*2)*scaleX*zoomScale);
     var cursorCtx = cursorCanvas.getContext('2d');
 
     cursorCtx.beginPath();
