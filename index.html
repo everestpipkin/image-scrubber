@@ -267,7 +267,7 @@ document.getElementById("file-input").onchange = function(e) {
             if (file && file.name) {
                 EXIF.getData(file, function() {
 
-                    console.log(this.exifdata.Orientation)
+                    alert(this.exifdata.Orientation)
                         if (this.exifdata.Orientation == 8){
                             ctx.rotate(90*Math.PI/180);
                             tempCtx.rotate(90*Math.PI/180);
