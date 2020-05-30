@@ -160,11 +160,13 @@ pre {
 </div>
 
 <div id="blurAmountDiv" class="topBarDiv"><center> Blur Amount<br>
-  <input type="range" min="0" max="200" value="100" class="slider" id="blurAmount"></center>
+  <input type="range" min="0" max="150" value="75" class="slider" id="blurAmount"></center>
 </div>
 
     <a id="downloadButton" onclick="downloadImage(this)" class="topBarDiv"><center>Download image ⤵</center></a>
 </div>
+
+<button id="rotate">rotate</button>
 
 <div id="imageScrubberInfo">
 <pre>
@@ -211,7 +213,7 @@ var holderCanvas = document.getElementById("holderCanvas");
 var holderCtx = holderCanvas.getContext("2d");
 
 var brushSize = 50;
-var blurAmount = 100;
+var blurAmount = 75;
 
 canvas.addEventListener('mousedown', handleMouseDown);
 canvas.addEventListener('mousemove', handleMouseMove);
@@ -230,6 +232,13 @@ brushSizeDiv.onchange = populateBrushSize;
 
 function populateBrushSize(){
     brushSize = Math.floor(this.value * canvas.width/800);
+}
+
+var blurAmountDiv = document.getElementById("blurAmount");
+blurAmountDiv.onchange = populateBrushSize;
+
+function populateBrushSize(){
+    blurAmount = Math.floor(this.value);
 }
 
 var isDown = false;
@@ -267,6 +276,7 @@ document.getElementById("file-input").onchange = function(e) {
             if (file && file.name) {
                 EXIF.getData(file, function() {
 
+/*
                     alert(this.exifdata.Orientation)
                         if (this.exifdata.Orientation == 8){
                             ctx.rotate(90*Math.PI/180);
@@ -283,7 +293,7 @@ document.getElementById("file-input").onchange = function(e) {
                             tempCtx.rotate(-90*Math.PI/180);
                             holderCtx.rotate(-90*Math.PI/180);
                         }
-                    
+                    */
                     var exifData = JSON.stringify(this.exifdata, null, 4);
                     if (exifData) {
                         //console.log(exifData)
@@ -358,6 +368,7 @@ function handleMouseUp(e) {
     ctx.restore();
 }
 
+//crashes chrome
 function handleMouseOut(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -377,6 +388,7 @@ function handleMouseMove(e) {
     e.stopPropagation();
     mouseX = pos.x; 
     mouseY = pos.y; 
+
     ctx.beginPath();
     ctx.arc(mouseX, mouseY, brushSize, 0, Math.PI * 2);
     ctx.closePath();
@@ -454,6 +466,7 @@ function handleMouseUp(e) {
     isDown = false;
     tempCtx.save();
     tempCtx.globalCompositeOperation = "source-in";
+    //heres the bad rotate
     tempCtx.drawImage(img, 0, 0);
     tempCtx.restore();
     stackBlurCanvasRGBA("tempCanvas", 0, 0, tempCanvas.width, tempCanvas.height, blurAmount);
@@ -497,12 +510,77 @@ function handleMouseMove(e) {
 
 function getMousePos(canvas, evt) {
     var rect = canvas.getBoundingClientRect();
+    console.log(rect);
     return {
         x: (evt.clientX - rect.left) / (rect.right - rect.left) * canvas.width,
         y: (evt.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height
     };
 }
 
+
+var button = document.getElementById("rotate");
+button.onclick = function () {
+    // rotate the canvas 90 degrees each time the button is pressed
+    rotate();
+}
+
+var myImageData, tempImageData, holderImageData, rotating = false;   
+
+var rotate = function () {
+    if (!rotating) {
+        rotating = true;            
+        // store current data to an image
+        myImageData = new Image();
+        tempImageData = new Image();
+        holderImageData = new Image();
+        myImageData.src = canvas.toDataURL();
+        tempImageData.src = tempCanvas.toDataURL();
+        holderImageData.src = holderCanvas.toDataURL();
+
+
+       myImageData.onload = function () {
+            // reset the canvas with new dimensions
+            canvas.width = canvas.height;
+            canvas.height = canvas.width;
+            tempCanvas.width = canvas.height;
+            tempCanvas.height = canvas.width;
+            holderCanvas.width = canvas.height;
+            holderCanvas.height = canvas.width;
+            cw = canvas.width;
+            ch = canvas.height;
+
+            ctx.save();
+            // translate and rotate
+            ctx.translate(cw, ch / cw);
+            ctx.rotate(Math.PI / 2);
+            // draw the previows image, now rotated
+            ctx.drawImage(myImageData, 0, 0);               
+            ctx.restore();
+
+            tempCtx.save();
+            // translate and rotate
+            tempCtx.translate(cw, ch / cw);
+            tempCtx.rotate(Math.PI / 2);
+            // draw the previows image, now rotated
+            tempCtx.drawImage(tempImageData, 0, 0);               
+            tempCtx.restore();
+
+            holderCtx.save();
+            // translate and rotate
+            holderCtx.translate(cw, ch / cw);
+            holderCtx.rotate(Math.PI / 2);
+            // draw the previows image, now rotated
+            holderCtx.drawImage(holderImageData, 0, 0);               
+            holderCtx.restore();
+
+            // clear the temporary image
+            myImageData = null;
+            tempImageData = null;
+            holderImageData = null;
+            rotating = false;               
+        }
+    }
+}
 
 //bits of this code lifted and adapted from various jsfiddles and libraries -- 
 //thank you:
@@ -513,6 +591,7 @@ function getMousePos(canvas, evt) {
 //http://quasimondo.com/StackBlurForCanvas/StackBlur.js
 //https://github.com/exif-js/exif-js
 //http://jsfiddle.net/4cwpLvae/
+//https://stackoverflow.com/questions/16645801/rotate-canvas-90-degrees-clockwise-and-update-width-height
     </script>
 </body>
 </html>
