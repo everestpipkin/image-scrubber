@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Image Scrubber</title>
+</head>
+<style>
+
+#imageCanvas{
+    position: absolute;
+    top: 55%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    max-width: 100%;
+    max-height: 88%;
+    z-index: -1;
+}
+
+#topBar{
+    width:100%;
+    height:10vh;
+    border: 1px solid black;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+}
+
+#file-input{
+    flex-direction: row;
+}
+
+#downloadButton{
+    padding-top: 2px;
+    border: 1px solid black;
+        cursor: pointer;
+
+}
+
+#uploadDiv{
+    padding-top: 2px;
+    border: 1px solid black;
+}
+
+#exifInformationHolder{
+    padding: 10px;
+    border: 1px solid black;
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin-right: auto;
+    margin-left: auto;
+    max-width: 70%;
+    max-width: 600px;
+    max-height: 88%;
+    background-color: white;
+    display: none;
+    z-index: 2;
+
+    position: absolute;
+    top: 55%;
+    transform: translateY(-50%);
+    max-height: 88%;
+}
+
+#imageScrubberInfo{
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin-right: auto;
+    margin-left: auto;
+    padding: 10px;
+    width: 80%;
+    max-width: 600px;
+    max-height: 88%;
+    background-color: white;
+    display: block;
+    z-index: 2;
+    font-size: 14px;
+}
+
+#exifScrollDiv{
+    position: inline-block;
+    height: 80vh;
+    max-height: 80vh;
+    overflow-y: auto;
+
+}
+
+#tempCanvas {
+    position:absolute;
+    top:-1000px;
+    display: none;
+}
+
+#holderCanvas {
+    position:absolute;
+    top:-1000px;
+    display: none;
+}
+
+body{
+    font-family: Courier;
+    margin: 0;
+    padding: 0;
+    font-size: 12px;
+    overflow: hidden;
+}
+
+button{
+font-family: Courier;
+    font-size: 12px;
+}
+.topBarDiv{
+    width: 20vw;
+    height: 5vh;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.file-upload {
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
+/* The slider itself */
+.slider {
+  width: 100%; /* Full-width */
+}
+
+pre {
+ white-space: pre-wrap;       /* css-3 */
+ white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+ white-space: -pre-wrap;      /* Opera 4-6 */
+ white-space: -o-pre-wrap;    /* Opera 7 */
+ word-wrap: break-word;       /* Internet Explorer 5.5+ */
+
+}
+
+.custom-file-upload{
+    cursor: pointer;
+}
+</style>
+<body>
+
+<div id="topBar">
+
+    <div id="uploadDiv" class="topBarDiv" class="custom-file-upload"><center>
+    <label for="file-input" class="custom-file-upload"><center>
+    Upload image ⤴</center>
+    </label>
+    <input id="file-input" type="file"/></center></div>
+
+<div id="brushSizeDiv" class="topBarDiv"><center> Brush Size<br>
+  <input type="range" min="1" max="100" value="50" class="slider" id="brushSize"></center>
+</div>
+
+<div id="blurAmountDiv" class="topBarDiv"><center> Blur Amount<br>
+  <input type="range" min="1" max="100" value="50" class="slider" id="blurAmount"></center>
+</div>
+
+    <a id="downloadButton" onclick="downloadImage(this)" class="topBarDiv"><center>Download image ⤵</center></a>
+</div>
+
+<div id="imageScrubberInfo">
+<pre>
+<center><b>Image Scrubber</b></center>
+
+This is a tool for anonymizing photographs taken at protests. 
+
+It will remove identifying metadata (<a href="https://en.wikipedia.org/wiki/Exif">Exif data</a>) from photographs, and also allow you to selectively blur parts of the image to cover faces and other identifiable information. 
+
+Hit the upload button to upload a photograph. The program will display the data it is removing. 
+
+Click okay, and you can then download the scrubbed image by hitting download or right clicking on it and saving it. 
+
+Dragging on the image will blur it. You can change your brush size and the intensity of the blur via the sliders. Set the blur to zero to undo. 
+
+
+All processing happens directly in the browser- no information is stored or sent anywhere. 
+
+Bug reports or questions to: everest.pipkin@gmail.com
+</pre>
+
+</div>
+
+    <div id="exifInformationHolder"><div id="exifScrollDiv"></div></div>
+    <canvas id="imageCanvas"></canvas>
+    <canvas id="tempCanvas"></canvas>
+    <canvas id="holderCanvas"></canvas>
+
+    <script type="text/javascript" src="exif.js"></script>
+    <script type="text/javascript" src="stackblur.js"></script>
+
+    <script>
+
+var filename;
+var img;
+
+var canvas = document.getElementById('imageCanvas');
+var ctx = canvas.getContext('2d');
+
+var tempCanvas = document.getElementById("tempCanvas");
+var tempCtx = tempCanvas.getContext("2d");
+
+var holderCanvas = document.getElementById("holderCanvas");
+var holderCtx = holderCanvas.getContext("2d");
+
+var brushSize = 50;
+var blurAmount = 30;
+
+canvas.addEventListener('mousedown', handleMouseDown);
+canvas.addEventListener('mousemove', handleMouseMove);
+canvas.addEventListener('mouseup', handleMouseUp);
+canvas.addEventListener('mouseout', handleMouseOut);
+
+canvas.addEventListener('touchstart', handleMouseDown);
+canvas.addEventListener('touchmove', handleTouchMove);
+canvas.addEventListener('touchend', handleMouseUp);
+canvas.addEventListener('touchcancel', handleMouseUp);
+
+
+var brushSizeDiv = document.getElementById("brushSize");
+brushSizeDiv.oninput = populateBrushSize;
+
+var blurAmountDiv = document.getElementById("blurAmount");
+blurAmountDiv.oninput = populateBlurAmount;
+
+function populateBrushSize(){
+    brushSize = this.value;
+}
+
+function populateBlurAmount(){
+    blurAmount = this.value;
+}
+
+var isDown = false;
+
+function downloadImage(){
+
+  var link = document.createElement('a');
+  link.download = filename;
+  link.href = document.getElementById('imageCanvas').toDataURL()
+  link.click();
+}
+
+document.getElementById("file-input").onchange = function(e) {
+
+    var reader = new FileReader();
+    reader.onload = function(event){
+        img = new Image();
+        img.onload = function(){
+            canvas.width = tempCanvas.width = holderCanvas.width = img.width;
+            canvas.height = tempCanvas.height = holderCanvas.height = img.height;
+            ctx.drawImage(img,0,0);
+        }
+        img.src = event.target.result;
+    }
+    reader.readAsDataURL(e.target.files[0]);    
+
+            filename = document.getElementById("file-input").value;
+            //console.log(e.target)
+            var exifInformationDiv = document.getElementById("exifInformationHolder");
+            var imageScrubberInfo = document.getElementById("imageScrubberInfo");
+            imageScrubberInfo.style.display = "none";
+            exifInformationDiv.style.display = "block";
+            var file = e.target.files[0]
+            if (file && file.name) {
+                EXIF.getData(file, function() {
+                    var exifData = JSON.stringify(this.exifdata, null, 4);
+                    if (exifData) {
+                        console.log(exifData)
+                        if (exifData.toString() == "{}"){
+                            exifInformationHolder.innerHTML = "No EXIF data found in image '" + file.name + "'.<br><br>";
+                        var btn = document.createElement("BUTTON");
+                        btn.innerHTML = "Go to blur image";
+                        btn.onclick = goToBlur;
+                        exifInformationHolder.appendChild(btn)
+                        }
+                        else{
+                        var exifScrollDiv = document.createElement("div");
+                        var exifScrollDiv = document.getElementById("exifScrollDiv");
+                        exifScrollDiv.innerHTML =  file.name + "<pre>" + exifData + "</pre>";
+                        exifInformationHolder.innerHTML = "Exif Data:<br><br>"
+                        exifInformationHolder.appendChild(exifScrollDiv)
+                        
+                        var btn = document.createElement("BUTTON");
+                        btn.innerHTML = "Scrub Exif Data";
+                        btn.onclick = scrubData;
+                        exifInformationHolder.appendChild(btn)
+}
+                    }
+                });
+            }
+        }
+
+function scrubData(){
+
+document.getElementById("exifInformationHolder").style.display = "none";
+alert("EXIF data removed: you may now download the image");
+
+}
+
+function goToBlur(){
+
+document.getElementById("exifInformationHolder").style.display = "none";
+
+}
+
+
+function handleMouseDown(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    holderCtx.save();
+    holderCtx.clearRect(0, 0, holderCanvas.width, holderCanvas.height);
+    holderCtx.drawImage(canvas, 0, 0);
+    holderCtx.restore();
+
+    tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+    isDown = true;
+}
+
+function handleMouseUp(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    isDown = false;
+    tempCtx.save();
+    tempCtx.globalCompositeOperation = "source-in";
+    tempCtx.drawImage(img, 0, 0);
+    tempCtx.restore();
+    stackBlurCanvasRGBA("tempCanvas", 0, 0, tempCanvas.width, tempCanvas.height, blurAmount);
+    ctx.save();
+    //ctx.globalCompositeOperation = "screen";
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(tempCanvas, 0, 0);
+    ctx.globalCompositeOperation = "destination-over";
+    ctx.drawImage(holderCanvas, 0, 0);
+    ctx.restore();
+}
+
+function handleMouseOut(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    isDown = false;
+}
+
+function handleMouseMove(e) {
+
+    var pos = getMousePos(canvas, e);
+    posx = pos.x;
+    posy = pos.y;
+
+    if (!isDown) {
+        return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    mouseX = pos.x; 
+    mouseY = pos.y; 
+    ctx.beginPath();
+    ctx.arc(mouseX, mouseY, brushSize, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.fill();
+    tempCtx.beginPath();
+    tempCtx.arc(mouseX, mouseY, brushSize, 0, Math.PI * 2);
+    tempCtx.closePath();
+    tempCtx.fill();
+}
+
+
+
+function handleTouchMove(e) {
+
+
+    if (e.touches.length > 1){  // Ignor multi touch events
+        return;
+    }
+
+    touch = event.changedTouches[0]; // get the position information
+
+//console.log(touch)
+
+    var mouseEvent = new MouseEvent( // create event
+    "mousemove",   // type of event
+    {
+        'view': event.target.ownerDocument.defaultView,
+        'bubbles': true,
+        'cancelable': true,
+        'screenX':touch.screenX,  // get the touch coords 
+        'screenY':touch.screenY,  // and add them to the 
+        'clientX':touch.clientX,  // mouse event
+        'clientY':touch.clientY,
+        });
+        // send it to the same target as the touch event contact point.
+    touch.target.dispatchEvent(mouseEvent);
+
+    var pos = getMousePos(canvas, e);
+    posx = pos.x;
+    posy = pos.y;
+
+    if (!isDown) {
+        return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    mouseX = pos.x; 
+    mouseY = pos.y; 
+    ctx.beginPath();
+    ctx.arc(mouseX, mouseY, brushSize, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.fill();
+    tempCtx.beginPath();
+    tempCtx.arc(mouseX, mouseY, brushSize, 0, Math.PI * 2);
+    tempCtx.closePath();
+    tempCtx.fill();
+}
+
+function handleMouseDown(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    holderCtx.save();
+    holderCtx.clearRect(0, 0, holderCanvas.width, holderCanvas.height);
+    holderCtx.drawImage(canvas, 0, 0);
+    holderCtx.restore();
+
+    tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+    isDown = true;
+}
+
+function handleMouseUp(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    isDown = false;
+    tempCtx.save();
+    tempCtx.globalCompositeOperation = "source-in";
+    tempCtx.drawImage(img, 0, 0);
+    tempCtx.restore();
+    stackBlurCanvasRGBA("tempCanvas", 0, 0, tempCanvas.width, tempCanvas.height, blurAmount);
+    ctx.save();
+    //ctx.globalCompositeOperation = "screen";
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(tempCanvas, 0, 0);
+    ctx.globalCompositeOperation = "destination-over";
+    ctx.drawImage(holderCanvas, 0, 0);
+    ctx.restore();
+}
+
+function handleMouseOut(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    isDown = false;
+}
+
+function handleMouseMove(e) {
+
+    var pos = getMousePos(canvas, e);
+    posx = pos.x;
+    posy = pos.y;
+
+    if (!isDown) {
+        return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    mouseX = pos.x; 
+    mouseY = pos.y; 
+    ctx.beginPath();
+    ctx.arc(mouseX, mouseY, brushSize, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.fill();
+    tempCtx.beginPath();
+    tempCtx.arc(mouseX, mouseY, brushSize, 0, Math.PI * 2);
+    tempCtx.closePath();
+    tempCtx.fill();
+}
+
+function getMousePos(canvas, evt) {
+    var rect = canvas.getBoundingClientRect();
+    return {
+        x: (evt.clientX - rect.left) / (rect.right - rect.left) * canvas.width,
+        y: (evt.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height
+    };
+}
+
+
+//bits of this code lifted and adapted from various jsfiddles and libraries -- 
+//thank you:
+//http://jsfiddle.net/sierawski/4xezb7nL/
+//https://stackoverflow.com/questions/22604903/needed-canvas-blurring-tool
+//http://jsfiddle.net/m1erickson/baDLp/
+//view-source:https://storage.flother.is/etc/2010/examples/canvas-blur/v3/canvas-image.js
+//http://quasimondo.com/StackBlurForCanvas/StackBlur.js
+//https://github.com/exif-js/exif-js
+//http://jsfiddle.net/4cwpLvae/
+    </script>
+</body>
+</html>
