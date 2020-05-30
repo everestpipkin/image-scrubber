@@ -246,6 +246,15 @@ document.getElementById("file-input").onchange = function(e) {
 
     var reader = new FileReader();
     reader.onload = function(event){
+        img = new Image();
+        img.onload = function(){
+            canvas.width = tempCanvas.width = holderCanvas.width = img.width;
+            canvas.height = tempCanvas.height = holderCanvas.height = img.height;
+            ctx.drawImage(img,0,0);
+            brushSize = Math.floor(50 * canvas.width/800);
+        }
+        img.src = event.target.result;
+    }
     reader.readAsDataURL(e.target.files[0]);    
 
             filename = document.getElementById("file-input").value;
@@ -259,20 +268,25 @@ document.getElementById("file-input").onchange = function(e) {
                 EXIF.getData(file, function() {
 
                     console.log(this.exifdata.Orientation)
-                        switch(this.exifdata.Orientation){
-                        case 8:
+                        if (this.exifdata.Orientation == 8){
                             ctx.rotate(90*Math.PI/180);
-                        break;
-                        case 3:
+                            tempCtx.rotate(90*Math.PI/180);
+                            holderCtx.rotate(90*Math.PI/180);
+                        }
+                        else if (this.exifdata.Orientation == 3){
                             ctx.rotate(180*Math.PI/180);
-                        break;
-                        case 6:
+                            tempCtx.rotate(180*Math.PI/180);
+                            holderCtx.rotate(180*Math.PI/180);
+                        }
+                        else if (this.exifdata.Orientation == 6){
                             ctx.rotate(-90*Math.PI/180);
-                        break;
-    }
+                            tempCtx.rotate(-90*Math.PI/180);
+                            holderCtx.rotate(-90*Math.PI/180);
+                        }
+                    
                     var exifData = JSON.stringify(this.exifdata, null, 4);
                     if (exifData) {
-                        console.log(exifData)
+                        //console.log(exifData)
                         if (exifData.toString() == "{}"){
                             exifInformationHolder.innerHTML = "No EXIF data found in image '" + file.name + "'.<br><br>";
                         var btn = document.createElement("BUTTON");
@@ -296,15 +310,6 @@ document.getElementById("file-input").onchange = function(e) {
                     }
                 });
             }
-                    img = new Image();
-        img.onload = function(){
-            canvas.width = tempCanvas.width = holderCanvas.width = img.width;
-            canvas.height = tempCanvas.height = holderCanvas.height = img.height;
-            ctx.drawImage(img,0,0);
-            brushSize = Math.floor(this.value * canvas.width/800);
-        }
-        img.src = event.target.result;
-    }
         }
 
 function scrubData(){
