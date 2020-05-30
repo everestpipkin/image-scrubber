@@ -34,14 +34,12 @@
 
 #downloadButton{
     padding-top: 2px;
-    border: 1px solid black;
-        cursor: pointer;
+    cursor: pointer;
 
 }
 
 #uploadDiv{
     padding-top: 2px;
-    border: 1px solid black;
 }
 
 #exifInformationHolder{
@@ -162,7 +160,7 @@ pre {
 </div>
 
 <div id="blurAmountDiv" class="topBarDiv"><center> Blur Amount<br>
-  <input type="range" min="1" max="100" value="50" class="slider" id="blurAmount"></center>
+  <input type="range" min="0" max="100" value="50" class="slider" id="blurAmount"></center>
 </div>
 
     <a id="downloadButton" onclick="downloadImage(this)" class="topBarDiv"><center>Download image ⤵</center></a>
@@ -190,7 +188,7 @@ Bug reports or questions to: everest.pipkin@gmail.com
 
 </div>
 
-    <div id="exifInformationHolder"><div id="exifScrollDiv"></div></div>
+    <div id="exifInformationHolder"></div>
     <canvas id="imageCanvas"></canvas>
     <canvas id="tempCanvas"></canvas>
     <canvas id="holderCanvas"></canvas>
@@ -213,7 +211,7 @@ var holderCanvas = document.getElementById("holderCanvas");
 var holderCtx = holderCanvas.getContext("2d");
 
 var brushSize = 50;
-var blurAmount = 30;
+var blurAmount = 50;
 
 canvas.addEventListener('mousedown', handleMouseDown);
 canvas.addEventListener('mousemove', handleMouseMove);
@@ -233,11 +231,11 @@ var blurAmountDiv = document.getElementById("blurAmount");
 blurAmountDiv.oninput = populateBlurAmount;
 
 function populateBrushSize(){
-    brushSize = this.value;
+    brushSize = floor(this.value * canvas.width/800);
 }
 
 function populateBlurAmount(){
-    blurAmount = this.value;
+    blurAmount = floor(this.value * canvas.width/800);
 }
 
 var isDown = false;
@@ -273,6 +271,18 @@ document.getElementById("file-input").onchange = function(e) {
             var file = e.target.files[0]
             if (file && file.name) {
                 EXIF.getData(file, function() {
+
+                        switch(this.exifdata.Orientation){
+                        case 8:
+                            ctx.rotate(90*Math.PI/180);
+                        break;
+                        case 3:
+                            ctx.rotate(180*Math.PI/180);
+                        break;
+                        case 6:
+                            ctx.rotate(-90*Math.PI/180);
+                        break;
+    }
                     var exifData = JSON.stringify(this.exifdata, null, 4);
                     if (exifData) {
                         console.log(exifData)
@@ -285,7 +295,8 @@ document.getElementById("file-input").onchange = function(e) {
                         }
                         else{
                         var exifScrollDiv = document.createElement("div");
-                        var exifScrollDiv = document.getElementById("exifScrollDiv");
+                        exifScrollDiv.id = "exifScrollDiv"
+                        //var exifScrollDiv = document.getElementById("exifScrollDiv");
                         exifScrollDiv.innerHTML =  file.name + "<pre>" + exifData + "</pre>";
                         exifInformationHolder.innerHTML = "Exif Data:<br><br>"
                         exifInformationHolder.appendChild(exifScrollDiv)
