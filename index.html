@@ -160,7 +160,7 @@ pre {
 </div>
 
 <div id="blurAmountDiv" class="topBarDiv"><center> Blur Amount<br>
-  <input type="range" min="0" max="150" value="75" class="slider" id="blurAmount"></center>
+  <input type="range" min="0" max="200" value="100" class="slider" id="blurAmount"></center>
 </div>
 
     <a id="downloadButton" onclick="downloadImage(this)" class="topBarDiv"><center>Download image ⤵</center></a>
@@ -211,7 +211,7 @@ var holderCanvas = document.getElementById("holderCanvas");
 var holderCtx = holderCanvas.getContext("2d");
 
 var brushSize = 50;
-var blurAmount = 75;
+var blurAmount = 100;
 
 canvas.addEventListener('mousedown', handleMouseDown);
 canvas.addEventListener('mousemove', handleMouseMove);
@@ -327,6 +327,7 @@ document.getElementById("exifInformationHolder").style.display = "none";
 
 
 function handleMouseDown(e) {
+    console.log(e)
     e.preventDefault();
     e.stopPropagation();
 
