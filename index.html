@@ -225,17 +225,17 @@ canvas.addEventListener('touchcancel', handleMouseUp);
 
 
 var brushSizeDiv = document.getElementById("brushSize");
-brushSizeDiv.oninput = populateBrushSize;
+brushSizeDiv.onchange = populateBrushSize;
 
 var blurAmountDiv = document.getElementById("blurAmount");
-blurAmountDiv.oninput = populateBlurAmount;
+blurAmountDiv.onchange = populateBlurAmount;
 
 function populateBrushSize(){
-    brushSize = floor(this.value * canvas.width/800);
+    brushSize = Math.floor(this.value * canvas.width/800);
 }
 
 function populateBlurAmount(){
-    blurAmount = floor(this.value * canvas.width/800);
+    blurAmount = Math.floor(this.value * canvas.width/800);
 }
 
 var isDown = false;
