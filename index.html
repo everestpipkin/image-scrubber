@@ -335,11 +335,12 @@ for (var i=0, len=sz.length; i<len; i++) {
 }
 
 function saveImage(){
-
-  var link = document.createElement('a');
-  link.download = filename;
-  link.href = document.getElementById('imageCanvas').toDataURL()
-  link.click();
+  document.getElementById('imageCanvas').toBlob(function (blob) {
+    var link = document.createElement('a');
+    link.download = filename;
+    link.href = URL.createObjectURL(blob);
+    link.click();
+  }, 'image/jpeg', 0.8);
 }
 
 document.getElementById("file-input").onchange = function(e) {
