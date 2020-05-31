@@ -256,7 +256,7 @@ Hit the open button to open a photograph. The program will display the data it i
 
 Click okay, and you can then save the scrubbed image by hitting save or right clicking on it and saving it. Maximum size is 2500x2500 pixels - larger images will be scaled down.
 
-You can select between painting over the image or blurring it out. Dragging on the image will paint on or blur it. You can change your brush size and the intensity of the blur via the sliders. Set the blur to zero to undo. 
+You can select between painting over the image or blurring it out. Dragging on the image will paint on or blur it. You can change your brush size via the slider. The blur function has built-in pixelization and noise.
 
 <strong>All processing happens directly in the browser- no information is stored or sent anywhere.</strong>
 
@@ -281,8 +281,7 @@ If you want other ways to cover your digital footprint, I've assembled a list of
 
 var filename;
 var img;
-var brushSize = 50;
-var blurAmount = 75;
+
 var isDown = false;
 var painting = false;
 
@@ -297,6 +296,13 @@ var holderCtx = holderCanvas.getContext("2d");
 
 var rotationCanvas = document.getElementById("rotationCanvas");
 var rotationCtx = rotationCanvas.getContext("2d");
+
+var brushSize = 50;
+var blurAmount = 50;
+
+//blur amount needs to be set for the size of the canvas ...
+//100 x 100 is arond 5, 2500 x 2500 is around 100
+//i map this later on in the set canvas size
 
 
 canvas.addEventListener('mousedown', handleMouseDown);
@@ -362,7 +368,12 @@ document.getElementById("file-input").onchange = function(e) {
             canvas.height = tempCanvas.height = holderCanvas.height = rotationCanvas.height = img.height*canvasScale;
             ctx.drawImage(img,0,0,img.width*canvasScale,img.height*canvasScale);
             rotationCtx.drawImage(img,0,0,img.width*canvasScale,img.height*canvasScale);
-            brushSize = Math.floor(50 * canvas.width/800);
+
+            var biggerDimension = Math.max(canvas.width, canvas.height);
+
+            brushSize = scale(biggerDimension, 10, 2500, 1, 75); //Math.floor(50 * canvas.width/800);
+            blurAmount = brushSize + (brushSize*0.5);//scale(biggerDimension, 10, 2500, 1, 75);
+
         }
         img.src = event.target.result;
     }
@@ -682,10 +693,10 @@ function pixelateCanvas(inCanvas, inCtx, blockSize){
 
     offscreenCtx.drawImage(inCanvas, 0, 0, w, h);
      
-    //pixelArray = offscreenCtx.getImageData(0, 0, w, h);
-    //pixelArray.data = shuffle(pixelArray.data)
+    pixelArray = offscreenCtx.getImageData(0, 0, w, h);
+    pixelArray.data = shuffle(pixelArray.data)
     //console.log(pixelArray.data)
-    //offscreenCtx.putImageData(pixelArray, 0,0);
+    offscreenCtx.putImageData(pixelArray, 0,0);
     inCtx.save();
 
     // enlarge the minimized image to full size    
@@ -699,19 +710,20 @@ function pixelateCanvas(inCanvas, inCtx, blockSize){
 function shuffle(array) {
     let counter = array.length;
 
+
     // While there are elements in the array
     while (counter > 0) {
         // Pick a random index
-        let index = Math.floor(Math.random() * counter);
+        //let index = Math.floor(Math.random() * counter);
 
         // Decrease counter by 1
         counter--;
 
         if (array[counter] != 0){
         // And swap the last element with it
-        let temp = array[counter];
-        array[counter] = array[index];
-        array[index] = temp;
+        //let temp = array[counter];
+        array[counter] = array[counter + Math.floor(Math.random() * 50)];
+        //array[index] = temp;
     }
     }
 
