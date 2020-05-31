@@ -25,7 +25,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-around;
+    justify-content: space-between;
 }
 
 #file-input{
@@ -75,7 +75,7 @@
     max-height: 88%;
     background-color: white;
     display: block;
-    z-index: 2;
+    z-index: 3;
     font-size: 14px;
 }
 
@@ -105,6 +105,14 @@
     display: none;
 }
 
+#about{
+  position:absolute;
+  bottom: 10px;
+  right: 10px;
+  z-index: 20;
+
+}
+
 body{
     font-family: Courier;
     margin: 0;
@@ -117,9 +125,20 @@ button{
 font-family: Courier;
     font-size: 12px;
 }
+
+#continueButton{
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 40%;
+}
+
 .topBarDiv{
-    width: 20vw;
+    width: 18vw;
     height: 5vh;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+
 }
 
 input[type="file"] {
@@ -147,6 +166,10 @@ pre {
 
 }
 
+#rotate{
+        cursor: pointer;
+}
+
 .custom-file-upload{
     cursor: pointer;
 }
@@ -161,6 +184,8 @@ pre {
     </label>
     <input id="file-input" type="file"/></center></div>
 
+<div id="rotate" class="topBarDiv"><center>Rotate Image</center></div>
+
 <div id="brushSizeDiv" class="topBarDiv"><center> Brush Size<br>
   <input type="range" min="1" max="100" value="50" class="slider" id="brushSize"></center>
 </div>
@@ -172,7 +197,6 @@ pre {
     <a id="downloadButton" onclick="downloadImage(this)" class="topBarDiv"><center>Download image ⤵</center></a>
 </div>
 
-<button id="rotate">Rotate Image</button>
 <button id="about">About</button>
 
 <div id="imageScrubberInfo">
@@ -292,9 +316,10 @@ document.getElementById("file-input").onchange = function(e) {
                     if (exifData) {
                         //console.log(exifData)
                         if (exifData.toString() == "{}"){
-                            exifInformationHolder.innerHTML = "No EXIF data found in image '" + file.name + "'.<br><br>";
+                            exifInformationHolder.innerHTML = "<center>No EXIF data found in image '" + file.name + "'.<br><br></center>";
                         var btn = document.createElement("BUTTON");
-                        btn.innerHTML = "Go to blur image";
+                        btn.id="continueButton";
+                        btn.innerHTML = "Continue to blur image";
                         btn.onclick = goToBlur;
                         exifInformationHolder.appendChild(btn)
                         }
@@ -460,6 +485,23 @@ button.onclick = function () {
     rotate();
 }
 
+
+var button = document.getElementById("about");
+button.onclick = function () {
+
+var imageScrubberInfo = document.getElementById("imageScrubberInfo");
+if (imageScrubberInfo.style.display == "none"){
+
+imageScrubberInfo.style.display = "block";
+
+}
+else{
+   imageScrubberInfo.style.display = "none"; 
+}
+
+}
+
+
 var myImageData, tempImageData, holderImageData, rotating = false;   
 
 var rotate = function () {
@@ -477,14 +519,16 @@ var rotate = function () {
 
        myImageData.onload = function () {
             // reset the canvas with new dimensions
-            canvas.width = canvas.height;
-            canvas.height = canvas.width;
-            tempCanvas.width = canvas.height;
-            tempCanvas.height = canvas.width;
-            holderCanvas.width = canvas.height;
-            holderCanvas.height = canvas.width;
-            rotationCanvas.width = canvas.height;
-            rotationCanvas.height = canvas.width;
+            cw = canvas.width;
+            ch = canvas.height;
+            canvas.width = ch;
+            canvas.height = cw;
+            tempCanvas.width = ch;
+            tempCanvas.height = cw;
+            holderCanvas.width = ch;
+            holderCanvas.height = cw;
+            rotationCanvas.width = ch;
+            rotationCanvas.height = cw;
             cw = canvas.width;
             ch = canvas.height;
 
