@@ -184,7 +184,7 @@ pre {
     </label>
     <input id="file-input" type="file"/></center></div>
 
-<div id="rotate" class="topBarDiv"><center>Rotate Image</center></div>
+<div id="rotate" class="topBarDiv"><center>Rotate Image ⟳</center></div>
 
 <div id="brushSizeDiv" class="topBarDiv"><center> Brush Size<br>
   <input type="range" min="1" max="100" value="50" class="slider" id="brushSize"></center>
@@ -332,6 +332,7 @@ document.getElementById("file-input").onchange = function(e) {
                         exifInformationHolder.appendChild(exifScrollDiv)
                         
                         var btn = document.createElement("BUTTON");
+                        btn.id="continueButton";
                         btn.innerHTML = "Scrub Exif Data";
                         btn.onclick = scrubData;
                         exifInformationHolder.appendChild(btn)
