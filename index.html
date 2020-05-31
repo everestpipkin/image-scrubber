@@ -16,6 +16,7 @@
     max-width: 100%;
     max-height: 82%;
     z-index: -1;
+    cursor: crosshair;
 }
 
 #topBar{
@@ -31,10 +32,12 @@
 
 .topBarDiv{
     width: 18vw;
-    height: 5vh;
+    height: 12vh;
     border-left: 1px solid #ccc;
     border-right: 1px solid #ccc;
-
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 @media (max-width: 800px) {
@@ -217,11 +220,12 @@ pre {
 
 <div id="paintBlur" class="topBarDiv" class="custom-file-open"><center>
 <form id="paintForm">
-  <input type="radio" id="Paint" name="paintingAction" value="true">
-  <label for="Paint">Paint</label><br>
-
-  <input type="radio" id="Blur" name="paintingAction" value="false" checked>
-  <label for="Blur">Blur</label>
+<input type="radio" id="Paint" name="paintingAction" value="paint">
+<label for="Paint">Paint</label><br>
+<input type="radio" id="Blur" name="paintingAction" value="blur" checked>
+<label for="Blur">Blur&nbsp;</label><br>
+<input type="radio" id="Undo" name="paintingAction" value="undo" checked>
+<label for="Undo">Undo&nbsp;</label>
 </form>
 </center>
 </div>
@@ -259,7 +263,7 @@ You can select between painting over the image or blurring it out. Dragging on t
 
 Bug reports or questions to: everest.pipkin@gmail.com
 
-If you want other ways to cover your digital footprint, I've assembled a list of resources: <a href="https://docs.google.com/document/d/1615pZB11BhsR0KtvyiXfzfMUBlxZi47HzzhWHIRpxwU/edit" target="_blank">via Google Doc</a> or <a href="https://pastebin.com/TPgtvmVB" target="_blank">Pastebin</a>.
+If you want other ways to cover your digital footprint, I've assembled a list of resources: via <a href="https://docs.google.com/document/d/1615pZB11BhsR0KtvyiXfzfMUBlxZi47HzzhWHIRpxwU/edit" target="_blank">Google Doc</a> or <a href="https://pastebin.com/TPgtvmVB" target="_blank">Pastebin</a>.
 </pre>
 
 </div>
@@ -277,6 +281,10 @@ If you want other ways to cover your digital footprint, I've assembled a list of
 
 var filename;
 var img;
+var brushSize = 50;
+var blurAmount = 75;
+var isDown = false;
+var painting = false;
 
 var canvas = document.getElementById('imageCanvas');
 var ctx = canvas.getContext('2d');
@@ -290,8 +298,6 @@ var holderCtx = holderCanvas.getContext("2d");
 var rotationCanvas = document.getElementById("rotationCanvas");
 var rotationCtx = rotationCanvas.getContext("2d");
 
-var brushSize = 50;
-var blurAmount = 75;
 
 canvas.addEventListener('mousedown', handleMouseDown);
 canvas.addEventListener('mousemove', handleMouseMove);
@@ -307,29 +313,24 @@ canvas.addEventListener('touchcancel', handleMouseUp);
 var brushSizeDiv = document.getElementById("brushSize");
 brushSizeDiv.onchange = populateBrushSize;
 
+var blurAmountDiv = document.getElementById("blurAmount");
+blurAmountDiv.onchange = populateBlurAmount;
 
 function populateBrushSize(){
     brushSize = Math.floor(this.value * canvas.width/800);
 }
 
-var blurAmountDiv = document.getElementById("blurAmount");
-blurAmountDiv.onchange = populateBlurAmount;
-
 function populateBlurAmount(){
     blurAmount = Math.floor(this.value);
 }
 
-var isDown = false;
-
-var painting = false;
-
-// get list of radio buttons with name 'size'
+// get list of radio buttons with name 'paintForm'
 var sz = document.forms['paintForm'].elements['paintingAction'];
 
 // loop through list
 for (var i=0, len=sz.length; i<len; i++) {
     sz[i].onclick = function() { 
-        console.log(this.value)
+        //console.log(this.value)
         painting = this.value;
     };
 }
@@ -355,7 +356,7 @@ document.getElementById("file-input").onchange = function(e) {
         else {
             var canvasScale = Math.min(2500 / img.width, 2500 / img.height)
         }
-            console.log(canvasScale)
+            //console.log(canvasScale)
 
             canvas.width = tempCanvas.width = holderCanvas.width = rotationCanvas.width = img.width*canvasScale;
             canvas.height = tempCanvas.height = holderCanvas.height = rotationCanvas.height = img.height*canvasScale;
@@ -401,23 +402,19 @@ document.getElementById("file-input").onchange = function(e) {
                         btn.innerHTML = "Scrub Exif Data";
                         btn.onclick = scrubData;
                         exifInformationHolder.appendChild(btn)
-}
+                    }
                     }
                 });
             }
         }
 
 function scrubData(){
-
-document.getElementById("exifInformationHolder").style.display = "none";
-alert("EXIF data removed: you may now save the image");
-
+    document.getElementById("exifInformationHolder").style.display = "none";
+    alert("EXIF data removed: you may now save the image");
 }
 
 function goToBlur(){
-
-document.getElementById("exifInformationHolder").style.display = "none";
-
+    document.getElementById("exifInformationHolder").style.display = "none";
 }
 
 
@@ -518,20 +515,29 @@ function handleMouseUp(e) {
     e.preventDefault();
     e.stopPropagation();
     isDown = false;
-    if (painting != "true"){
-    tempCtx.save();
-    tempCtx.globalCompositeOperation = "source-in";
-    tempCtx.drawImage(rotationCanvas, 0, 0);
-    tempCtx.restore();
-    stackBlurCanvasRGBA("tempCanvas", 0, 0, tempCanvas.width, tempCanvas.height, blurAmount);
-    ctx.save();
-    //ctx.globalCompositeOperation = "screen";
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(tempCanvas, 0, 0);
-    ctx.globalCompositeOperation = "destination-over";
-    ctx.drawImage(holderCanvas, 0, 0);
-    ctx.restore();
-}
+    if (painting != "paint"){
+        var tempBlurAmount = blurAmount;
+        if (painting == "undo"){
+            blurAmount = 0;
+        }
+        tempCtx.save();
+        tempCtx.globalCompositeOperation = "source-in";
+        tempCtx.drawImage(rotationCanvas, 0, 0);
+        tempCtx.restore();
+        //pixelate function goes here
+        if (painting != "undo"){
+        pixelateCanvas(tempCanvas, tempCtx, 10);
+        }
+        stackBlurCanvasRGBA("tempCanvas", 0, 0, tempCanvas.width, tempCanvas.height, blurAmount);
+        ctx.save();
+        //ctx.globalCompositeOperation = "screen";
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(tempCanvas, 0, 0);
+        ctx.globalCompositeOperation = "destination-over";
+        ctx.drawImage(holderCanvas, 0, 0);
+        ctx.restore();
+        blurAmount = tempBlurAmount;
+    }
 }
 
 
@@ -556,15 +562,15 @@ button.onclick = function () {
 var button = document.getElementById("about");
 button.onclick = function () {
 
-var imageScrubberInfo = document.getElementById("imageScrubberInfo");
-if (imageScrubberInfo.style.display == "none"){
+    var imageScrubberInfo = document.getElementById("imageScrubberInfo");
+    if (imageScrubberInfo.style.display == "none"){
 
-imageScrubberInfo.style.display = "block";
+        imageScrubberInfo.style.display = "block";
 
-}
-else{
-   imageScrubberInfo.style.display = "none"; 
-}
+    }
+    else{
+       imageScrubberInfo.style.display = "none"; 
+    }
 
 }
 
@@ -641,6 +647,78 @@ var rotate = function () {
     }
 }
 
+
+
+const scale = (num, in_min, in_max, out_min, out_max) => {
+  return (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+function pixelateCanvas(inCanvas, inCtx, blockSize){
+
+    // so - smaller canvases need to be bigger block size, because they get too small to render anything
+    //a 10x10 pixel image should be around .5
+    //a 2500x2500 should be around 0.03
+    //just gonna use a map function - see above
+
+    var biggerDimension = Math.max(inCanvas.width, inCanvas.height);
+
+    var size = scale(biggerDimension, 10, 2500, 0.5, 0.03); // 150
+    //console.log(size);
+    w = inCanvas.width * size;
+    h = inCanvas.height * size;
+
+    // create offscreen image
+    var offscreenCanvas = document.createElement('canvas');
+    offscreenCanvas.width = w;
+    offscreenCanvas.height = h;
+
+    var offscreenCtx = offscreenCanvas.getContext('2d');
+
+    // turn off image aliasing
+    offscreenCtx.msImageSmoothingEnabled = false;
+    offscreenCtx.mozImageSmoothingEnabled = false;
+    offscreenCtx.webkitImageSmoothingEnabled = false;
+    offscreenCtx.imageSmoothingEnabled = false;
+
+    offscreenCtx.drawImage(inCanvas, 0, 0, w, h);
+     
+    //pixelArray = offscreenCtx.getImageData(0, 0, w, h);
+    //pixelArray.data = shuffle(pixelArray.data)
+    //console.log(pixelArray.data)
+    //offscreenCtx.putImageData(pixelArray, 0,0);
+    inCtx.save();
+
+    // enlarge the minimized image to full size    
+    inCtx.drawImage(offscreenCanvas, 0, 0, w, h, 0, 0, inCanvas.width, inCanvas.height);
+    inCtx.restore();
+    //holderCtx.restore();
+
+}
+
+
+function shuffle(array) {
+    let counter = array.length;
+
+    // While there are elements in the array
+    while (counter > 0) {
+        // Pick a random index
+        let index = Math.floor(Math.random() * counter);
+
+        // Decrease counter by 1
+        counter--;
+
+        if (array[counter] != 0){
+        // And swap the last element with it
+        let temp = array[counter];
+        array[counter] = array[index];
+        array[index] = temp;
+    }
+    }
+
+    return array;
+}
+
+
 //bits of this code lifted and adapted from various jsfiddles and libraries -- 
 //thank you:
 //http://jsfiddle.net/sierawski/4xezb7nL/
@@ -651,6 +729,13 @@ var rotate = function () {
 //https://github.com/exif-js/exif-js
 //http://jsfiddle.net/4cwpLvae/
 //https://stackoverflow.com/questions/16645801/rotate-canvas-90-degrees-clockwise-and-update-width-height
+//https://stackoverflow.com/questions/19129644/how-to-pixelate-an-image-with-canvas-and-javascript
+//https://devbutze.blogspot.com/2014/02/html5-canvas-offscreen-rendering.html
+
+
+
+/// // // / 
+
     </script>
 </body>
 </html>
