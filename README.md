@@ -34,5 +34,6 @@ https://github.com/exif-js/exif-js
 
 http://jsfiddle.net/4cwpLvae/
 
+https://stackoverflow.com/questions/16645801/rotate-canvas-90-degrees-clockwise-and-update-width-height
 
-My code is a terrible mess right now but I'm going to bed - utility over cleanliness, will fix up in the morning.
+My code is a terrible mess right now but utility over cleanliness, will fix up in the coming days.

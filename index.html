@@ -28,6 +28,34 @@
     justify-content: space-between;
 }
 
+
+.topBarDiv{
+    width: 18vw;
+    height: 5vh;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+
+}
+
+@media (max-width: 800px) {
+
+ #topBar {
+    flex-wrap: wrap;
+    height:15vh;
+  }
+
+
+.topBarDiv{
+    width: 33vw;
+    height: 5vh;
+    border-top: 0px solid #ccc;
+    border-left: 0px solid #ccc;
+    border-right: 0px solid #ccc;
+
+}
+
+}
+
 #file-input{
     flex-direction: row;
 }
@@ -133,13 +161,6 @@ font-family: Courier;
   width: 40%;
 }
 
-.topBarDiv{
-    width: 18vw;
-    height: 5vh;
-    border-left: 1px solid #ccc;
-    border-right: 1px solid #ccc;
-
-}
 
 input[type="file"] {
     display: none;
@@ -154,7 +175,7 @@ input[type="file"] {
 
 /* The slider itself */
 .slider {
-  width: 100%; /* Full-width */
+  width: 95%; /* Full-width */
 }
 
 pre {
@@ -184,7 +205,20 @@ pre {
     </label>
     <input id="file-input" type="file"/></center></div>
 
-<div id="rotate" class="topBarDiv"><center>Rotate Image ⟳</center></div>
+<div id="rotate" class="topBarDiv"><center>Rotate Image ⤾</center></div>
+
+
+<div id="paintBlur" class="topBarDiv" class="custom-file-upload"><center>
+<form id="paintForm">
+  <input type="radio" id="Paint" name="paintingAction" value="true">
+  <label for="Paint">Paint</label><br>
+
+  <input type="radio" id="Blur" name="paintingAction" value="false" checked>
+  <label for="Blur">Blur</label>
+</form>
+</center>
+</div>
+
 
 <div id="brushSizeDiv" class="topBarDiv"><center> Brush Size<br>
   <input type="range" min="1" max="100" value="50" class="slider" id="brushSize"></center>
@@ -209,9 +243,9 @@ It will remove identifying metadata (<a href="https://en.wikipedia.org/wiki/Exif
 
 Hit the upload button to upload a photograph. The program will display the data it is removing. 
 
-Click okay, and you can then download the scrubbed image by hitting download or right clicking on it and saving it. 
+Click okay, and you can then download the scrubbed image by hitting download or right clicking on it and saving it. Maximum size is 2500x2500 pixels - larger images will be scaled down. 
 
-Dragging on the image will blur it. You can change your brush size and the intensity of the blur via the sliders. Set the blur to zero to undo. 
+You can select between painting over the image or blurring it out. Dragging on the image will paint on or blur it. You can change your brush size and the intensity of the blur via the sliders. Set the blur to zero to undo. 
 
 
 All processing happens directly in the browser- no information is stored or sent anywhere. 
@@ -278,6 +312,19 @@ function populateBlurAmount(){
 
 var isDown = false;
 
+var painting = false;
+
+// get list of radio buttons with name 'size'
+var sz = document.forms['paintForm'].elements['paintingAction'];
+
+// loop through list
+for (var i=0, len=sz.length; i<len; i++) {
+    sz[i].onclick = function() { 
+        console.log(this.value)
+        painting = this.value;
+    };
+}
+
 function downloadImage(){
 
   var link = document.createElement('a');
@@ -292,11 +339,11 @@ document.getElementById("file-input").onchange = function(e) {
     reader.onload = function(event){
         img = new Image();
         img.onload = function(){
-            if (img.width < 2000 && img.height < 2000){
+            if (img.width < 2500 && img.height < 2500){
                 var canvasScale = 1;
         }
         else {
-            var canvasScale = Math.min(2000 / img.width, 2000 / img.height)
+            var canvasScale = Math.min(2500 / img.width, 2500 / img.height)
         }
             console.log(canvasScale)
 
@@ -461,9 +508,9 @@ function handleMouseUp(e) {
     e.preventDefault();
     e.stopPropagation();
     isDown = false;
+    if (painting != "true"){
     tempCtx.save();
     tempCtx.globalCompositeOperation = "source-in";
-    //also figure out why its cutting bits off
     tempCtx.drawImage(rotationCanvas, 0, 0);
     tempCtx.restore();
     stackBlurCanvasRGBA("tempCanvas", 0, 0, tempCanvas.width, tempCanvas.height, blurAmount);
@@ -474,6 +521,7 @@ function handleMouseUp(e) {
     ctx.globalCompositeOperation = "destination-over";
     ctx.drawImage(holderCanvas, 0, 0);
     ctx.restore();
+}
 }
 
 
