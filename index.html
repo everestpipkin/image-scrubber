@@ -99,6 +99,12 @@
     display: none;
 }
 
+#rotationCanvas {
+    position:absolute;
+    top:-1000px;
+    display: none;
+}
+
 body{
     font-family: Courier;
     margin: 0;
@@ -166,7 +172,8 @@ pre {
     <a id="downloadButton" onclick="downloadImage(this)" class="topBarDiv"><center>Download image ⤵</center></a>
 </div>
 
-<button id="rotate">rotate</button>
+<button id="rotate">Rotate Image</button>
+<button id="about">About</button>
 
 <div id="imageScrubberInfo">
 <pre>
@@ -194,6 +201,7 @@ Bug reports or questions to: everest.pipkin@gmail.com
     <canvas id="imageCanvas"></canvas>
     <canvas id="tempCanvas"></canvas>
     <canvas id="holderCanvas"></canvas>
+    <canvas id="rotationCanvas"></canvas>
 
     <script type="text/javascript" src="exif.js"></script>
     <script type="text/javascript" src="stackblur.js"></script>
@@ -211,6 +219,9 @@ var tempCtx = tempCanvas.getContext("2d");
 
 var holderCanvas = document.getElementById("holderCanvas");
 var holderCtx = holderCanvas.getContext("2d");
+
+var rotationCanvas = document.getElementById("rotationCanvas");
+var rotationCtx = rotationCanvas.getContext("2d");
 
 var brushSize = 50;
 var blurAmount = 75;
@@ -235,9 +246,9 @@ function populateBrushSize(){
 }
 
 var blurAmountDiv = document.getElementById("blurAmount");
-blurAmountDiv.onchange = populateBrushSize;
+blurAmountDiv.onchange = populateBlurAmount;
 
-function populateBrushSize(){
+function populateBlurAmount(){
     blurAmount = Math.floor(this.value);
 }
 
@@ -257,9 +268,10 @@ document.getElementById("file-input").onchange = function(e) {
     reader.onload = function(event){
         img = new Image();
         img.onload = function(){
-            canvas.width = tempCanvas.width = holderCanvas.width = img.width;
-            canvas.height = tempCanvas.height = holderCanvas.height = img.height;
+            canvas.width = tempCanvas.width = holderCanvas.width = rotationCanvas.width = img.width;
+            canvas.height = tempCanvas.height = holderCanvas.height = rotationCanvas.height = img.height;
             ctx.drawImage(img,0,0);
+            rotationCtx.drawImage(img,0,0);
             brushSize = Math.floor(50 * canvas.width/800);
         }
         img.src = event.target.result;
@@ -276,24 +288,6 @@ document.getElementById("file-input").onchange = function(e) {
             if (file && file.name) {
                 EXIF.getData(file, function() {
 
-/*
-                    alert(this.exifdata.Orientation)
-                        if (this.exifdata.Orientation == 8){
-                            ctx.rotate(90*Math.PI/180);
-                            tempCtx.rotate(90*Math.PI/180);
-                            holderCtx.rotate(90*Math.PI/180);
-                        }
-                        else if (this.exifdata.Orientation == 3){
-                            ctx.rotate(180*Math.PI/180);
-                            tempCtx.rotate(180*Math.PI/180);
-                            holderCtx.rotate(180*Math.PI/180);
-                        }
-                        else if (this.exifdata.Orientation == 6){
-                            ctx.rotate(-90*Math.PI/180);
-                            tempCtx.rotate(-90*Math.PI/180);
-                            holderCtx.rotate(-90*Math.PI/180);
-                        }
-                    */
                     var exifData = JSON.stringify(this.exifdata, null, 4);
                     if (exifData) {
                         //console.log(exifData)
@@ -337,7 +331,7 @@ document.getElementById("exifInformationHolder").style.display = "none";
 
 
 function handleMouseDown(e) {
-    console.log(e)
+    //console.log(e)
     e.preventDefault();
     e.stopPropagation();
 
@@ -348,24 +342,6 @@ function handleMouseDown(e) {
 
     tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
     isDown = true;
-}
-
-function handleMouseUp(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    isDown = false;
-    tempCtx.save();
-    tempCtx.globalCompositeOperation = "source-in";
-    tempCtx.drawImage(img, 0, 0);
-    tempCtx.restore();
-    stackBlurCanvasRGBA("tempCanvas", 0, 0, tempCanvas.width, tempCanvas.height, blurAmount);
-    ctx.save();
-    //ctx.globalCompositeOperation = "screen";
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(tempCanvas, 0, 0);
-    ctx.globalCompositeOperation = "destination-over";
-    ctx.drawImage(holderCanvas, 0, 0);
-    ctx.restore();
 }
 
 //crashes chrome
@@ -447,27 +423,14 @@ function handleTouchMove(e) {
     tempCtx.fill();
 }
 
-function handleMouseDown(e) {
-    e.preventDefault();
-    e.stopPropagation();
-
-    holderCtx.save();
-    holderCtx.clearRect(0, 0, holderCanvas.width, holderCanvas.height);
-    holderCtx.drawImage(canvas, 0, 0);
-    holderCtx.restore();
-
-    tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
-    isDown = true;
-}
-
 function handleMouseUp(e) {
     e.preventDefault();
     e.stopPropagation();
     isDown = false;
     tempCtx.save();
     tempCtx.globalCompositeOperation = "source-in";
-    //heres the bad rotate
-    tempCtx.drawImage(img, 0, 0);
+    //also figure out why its cutting bits off
+    tempCtx.drawImage(rotationCanvas, 0, 0);
     tempCtx.restore();
     stackBlurCanvasRGBA("tempCanvas", 0, 0, tempCanvas.width, tempCanvas.height, blurAmount);
     ctx.save();
@@ -479,38 +442,11 @@ function handleMouseUp(e) {
     ctx.restore();
 }
 
-function handleMouseOut(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    isDown = false;
-}
 
-function handleMouseMove(e) {
-
-    var pos = getMousePos(canvas, e);
-    posx = pos.x;
-    posy = pos.y;
-
-    if (!isDown) {
-        return;
-    }
-    e.preventDefault();
-    e.stopPropagation();
-    mouseX = pos.x; 
-    mouseY = pos.y; 
-    ctx.beginPath();
-    ctx.arc(mouseX, mouseY, brushSize, 0, Math.PI * 2);
-    ctx.closePath();
-    ctx.fill();
-    tempCtx.beginPath();
-    tempCtx.arc(mouseX, mouseY, brushSize, 0, Math.PI * 2);
-    tempCtx.closePath();
-    tempCtx.fill();
-}
 
 function getMousePos(canvas, evt) {
     var rect = canvas.getBoundingClientRect();
-    console.log(rect);
+    //console.log(rect);
     return {
         x: (evt.clientX - rect.left) / (rect.right - rect.left) * canvas.width,
         y: (evt.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height
@@ -532,10 +468,11 @@ var rotate = function () {
         // store current data to an image
         myImageData = new Image();
         tempImageData = new Image();
-        holderImageData = new Image();
+        rotationImageData = new Image();
         myImageData.src = canvas.toDataURL();
         tempImageData.src = tempCanvas.toDataURL();
-        holderImageData.src = holderCanvas.toDataURL();
+        rotationImageData.src = rotationCanvas.toDataURL();
+        //holderImageData.src = holderCanvas.toDataURL();
 
 
        myImageData.onload = function () {
@@ -546,6 +483,8 @@ var rotate = function () {
             tempCanvas.height = canvas.width;
             holderCanvas.width = canvas.height;
             holderCanvas.height = canvas.width;
+            rotationCanvas.width = canvas.height;
+            rotationCanvas.height = canvas.width;
             cw = canvas.width;
             ch = canvas.height;
 
@@ -565,18 +504,27 @@ var rotate = function () {
             tempCtx.drawImage(tempImageData, 0, 0);               
             tempCtx.restore();
 
-            holderCtx.save();
+
+            rotationCtx.save();
             // translate and rotate
-            holderCtx.translate(cw, ch / cw);
-            holderCtx.rotate(Math.PI / 2);
+            rotationCtx.translate(cw, ch / cw);
+            rotationCtx.rotate(Math.PI / 2);
             // draw the previows image, now rotated
-            holderCtx.drawImage(holderImageData, 0, 0);               
-            holderCtx.restore();
+            rotationCtx.drawImage(rotationImageData, 0, 0);               
+            rotationCtx.restore();
+
+            //holderCtx.save();
+            // translate and rotate
+            //holderCtx.translate(cw, ch / cw);
+            //holderCtx.rotate(Math.PI / 2);
+            // draw the previows image, now rotated
+            //holderCtx.drawImage(holderImageData, 0, 0);               
+            //holderCtx.restore();
 
             // clear the temporary image
             myImageData = null;
             tempImageData = null;
-            holderImageData = null;
+            //holderImageData = null;
             rotating = false;               
         }
     }
