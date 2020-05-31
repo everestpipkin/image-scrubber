@@ -5,14 +5,14 @@ Tool lives at : https://everestpipkin.github.io/image-scrubber/
 
 It will remove identifying metadata (Exif data) from photographs, and also allow you to selectively blur parts of the image to cover faces and other identifiable information. 
 
-Hit the upload button to upload a photograph. The program will display the data it is removing. 
+Hit the open button to open a photograph. The program will display the data it is removing. 
 
-Click okay, and you can then download the scrubbed image by hitting download or right clicking on it and saving it. 
+Click okay, and you can then save the scrubbed image by hitting save or right clicking on it and saving it. 
 
 Dragging on the image will blur it. You can change your brush size and the intensity of the blur via the sliders. Set the blur to zero to undo. 
 
 
-All processing happens directly in the browser- no information is stored or sent anywhere. 
+**All processing happens directly in the browser- no information is stored or sent anywhere.** 
 
 
 
