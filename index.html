@@ -27,6 +27,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    box-sizing: border-box;
 }
 
 
@@ -115,6 +116,14 @@
     display: block;
     z-index: 3;
     font-size: 14px;
+    overflow: auto;
+    box-sizing: border-box;
+}
+
+@media (max-width: 800px) {
+    #imageScrubberInfo {
+        max-height: 85%;
+    }
 }
 
 #exifScrollDiv{
