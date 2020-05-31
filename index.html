@@ -41,31 +41,6 @@
     justify-content: center;
 }
 
-@media (max-width: 800px) {
-
- #topBar {
-    flex-wrap: wrap;
-    height:15vh;
-  }
-
-
-.topBarDiv{
-    width: 33vw;
-    height: 5vh;
-    border-top: 0px solid #ccc;
-    border-left: 0px solid #ccc;
-    border-right: 0px solid #ccc;
-
-}
-
-
-#imageCanvas{
-    position: absolute;
-    top: 58%;
-    max-height: 80%;
-}
-
-}
 
 #file-input{
     flex-direction: row;
@@ -120,22 +95,25 @@
     box-sizing: border-box;
 }
 
+
 @media (max-width: 800px) {
     #imageScrubberInfo {
-        max-height: 80%;
+        max-height: 75%;
     }
 
 
  #topBar {
     flex-wrap: wrap;
     height:20vh;
+    align-items: flex-start;
   }
 
 
 .topBarDiv{
     width: 33vw;
-    height: 10vh;
-    border-top: 0px solid #ccc;
+    height: 8vh;
+    max-height:10vh;
+    border: 0px solid #ccc;
     border-left: 0px solid #ccc;
     border-right: 0px solid #ccc;
 
@@ -145,7 +123,7 @@
 #imageCanvas{
     position: absolute;
     top: 58%;
-    max-height: 80%;
+    max-height: 75%;
 }
 
 #continueButtonExif{
@@ -158,8 +136,8 @@
 
 #exifScrollDiv{
     position: inline-block;
-    height: 80vh;
-    max-height: 80vh;
+    height: 75vh;
+    max-height: 75vh;
     overflow-y: auto;
 
 }
