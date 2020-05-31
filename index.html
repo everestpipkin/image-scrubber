@@ -292,10 +292,18 @@ document.getElementById("file-input").onchange = function(e) {
     reader.onload = function(event){
         img = new Image();
         img.onload = function(){
-            canvas.width = tempCanvas.width = holderCanvas.width = rotationCanvas.width = img.width;
-            canvas.height = tempCanvas.height = holderCanvas.height = rotationCanvas.height = img.height;
-            ctx.drawImage(img,0,0);
-            rotationCtx.drawImage(img,0,0);
+            if (img.width < 2000 && img.height < 2000){
+                var canvasScale = 1;
+        }
+        else {
+            var canvasScale = Math.min(2000 / img.width, 2000 / img.height)
+        }
+            console.log(canvasScale)
+
+            canvas.width = tempCanvas.width = holderCanvas.width = rotationCanvas.width = img.width*canvasScale;
+            canvas.height = tempCanvas.height = holderCanvas.height = rotationCanvas.height = img.height*canvasScale;
+            ctx.drawImage(img,0,0,img.width*canvasScale,img.height*canvasScale);
+            rotationCtx.drawImage(img,0,0,img.width*canvasScale,img.height*canvasScale);
             brushSize = Math.floor(50 * canvas.width/800);
         }
         img.src = event.target.result;
