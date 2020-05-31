@@ -148,6 +148,12 @@
     max-height: 80%;
 }
 
+#continueButtonExif{
+    position: absolute;
+    bottom: 10%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+}
 }
 
 #exifScrollDiv{
@@ -197,7 +203,7 @@ font-family: Courier;
     font-size: 12px;
 }
 
-#continueButton{
+#continueButton, #continueButtonExif{
   display: block;
   margin-left: auto;
   margin-right: auto;
@@ -429,7 +435,7 @@ document.getElementById("file-input").onchange = function(e) {
                             exifInformationHolder.innerHTML = "<center>No EXIF data found in image '" + file.name + "'.<br><br></center>";
                         var btn = document.createElement("BUTTON");
                         btn.id="continueButton";
-                        btn.innerHTML = "Continue to blur image";
+                        btn.innerHTML = "Continue to edit image";
                         btn.onclick = goToBlur;
                         exifInformationHolder.appendChild(btn)
                         }
@@ -442,7 +448,7 @@ document.getElementById("file-input").onchange = function(e) {
                         exifInformationHolder.appendChild(exifScrollDiv)
                         
                         var btn = document.createElement("BUTTON");
-                        btn.id="continueButton";
+                        btn.id="continueButtonExif";
                         btn.innerHTML = "Scrub Exif Data";
                         btn.onclick = scrubData;
                         exifInformationHolder.appendChild(btn)
