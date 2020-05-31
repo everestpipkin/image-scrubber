@@ -255,8 +255,8 @@ pre {
   <input type="range" min="1" max="100" value="50" class="slider" id="brushSize"></center>
 </div>
 
-<div id="blurAmountDiv" class="topBarDiv"><center> Blur Amount<br>
-  <input type="range" min="0" max="150" value="75" class="slider" id="blurAmount"></center>
+<div id="blurAmountDiv" class="topBarDiv"><center> Blur Radius<br>
+  <input type="range" min="20" max="130" value="75" class="slider" id="blurAmount"></center>
 </div>
 </div>
 
@@ -280,6 +280,8 @@ You can select between painting over the image or blurring it out. Dragging on t
 
 
 Bug reports or questions to: everest.pipkin@gmail.com
+
+Github repo at <a href="https://github.com/everestpipkin/image-scrubber" target="_blank">github.com/everestpipkin/image-scrubber</a>
 
 If you want other ways to cover your digital footprint, I've assembled a list of resources: via <a href="https://docs.google.com/document/d/1615pZB11BhsR0KtvyiXfzfMUBlxZi47HzzhWHIRpxwU/edit" target="_blank">Google Doc</a> or <a href="https://pastebin.com/TPgtvmVB" target="_blank">Pastebin</a>.
 </pre>
@@ -389,9 +391,12 @@ document.getElementById("file-input").onchange = function(e) {
 
             var biggerDimension = Math.max(canvas.width, canvas.height);
 
-            brushSize = scale(biggerDimension, 10, 2500, 1, 75); //Math.floor(50 * canvas.width/800);
-            blurAmount = brushSize + (brushSize*0.5);//scale(biggerDimension, 10, 2500, 1, 75);
 
+            // i need to come back to this - blur amount and brush size deviate at big and small images
+
+            brushSize = scale(biggerDimension, 10, 2500, 20, 100); //Math.floor(50 * canvas.width/800);
+            blurAmount = brushSize/2;//scale(biggerDimension, 10, 2500, 1, 75);
+            //console.log(brushSize)
         }
         img.src = event.target.result;
     }
@@ -461,7 +466,7 @@ function handleMouseDown(e) {
     isDown = true;
 }
 
-//crashes chrome
+//weird bug where it doesn't blur / crashes if you leave w mouse pressed, fix soon
 function handleMouseOut(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -691,7 +696,7 @@ function pixelateCanvas(inCanvas, inCtx, blockSize){
 
     var biggerDimension = Math.max(inCanvas.width, inCanvas.height);
 
-    var size = scale(biggerDimension, 10, 2500, 0.5, 0.03); // 150
+    var size = scale(biggerDimension, 10, 2500, 0.5, 0.06); // 150
     //console.log(size);
     w = inCanvas.width * size;
     h = inCanvas.height * size;
@@ -710,15 +715,19 @@ function pixelateCanvas(inCanvas, inCtx, blockSize){
     offscreenCtx.imageSmoothingEnabled = false;
 
     offscreenCtx.drawImage(inCanvas, 0, 0, w, h);
-     
+    inCtx.save();
+
+    // enlarge the minimized image to full size and draw to main canvas  
+    inCtx.drawImage(offscreenCanvas, 0, 0, w, h, 0, 0, inCanvas.width, inCanvas.height);
+
     pixelArray = offscreenCtx.getImageData(0, 0, w, h);
     pixelArray.data = shuffle(pixelArray.data)
     //console.log(pixelArray.data)
     offscreenCtx.putImageData(pixelArray, 0,0);
-    inCtx.save();
 
-    // enlarge the minimized image to full size    
+    // enlarge the minimized image to full size and draw to main canvas  
     inCtx.drawImage(offscreenCanvas, 0, 0, w, h, 0, 0, inCanvas.width, inCanvas.height);
+
     inCtx.restore();
     //holderCtx.restore();
 
@@ -740,7 +749,7 @@ function shuffle(array) {
         if (array[counter] != 0){
         // And swap the last element with it
         //let temp = array[counter];
-        array[counter] = array[counter + Math.floor(Math.random() * 50)];
+        array[counter] = array[counter + Math.floor(Math.random() * 30)];
         //array[index] = temp;
     }
     }
