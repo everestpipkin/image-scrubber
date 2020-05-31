@@ -122,19 +122,19 @@
 
 @media (max-width: 800px) {
     #imageScrubberInfo {
-        max-height: 85%;
+        max-height: 80%;
     }
 
 
  #topBar {
     flex-wrap: wrap;
-    height:15vh;
+    height:20vh;
   }
 
 
 .topBarDiv{
     width: 33vw;
-    height: 5vh;
+    height: 10vh;
     border-top: 0px solid #ccc;
     border-left: 0px solid #ccc;
     border-right: 0px solid #ccc;
@@ -254,6 +254,9 @@ pre {
     </label>
     <input id="file-input" type="file"/></center></div>
 
+<a id="saveButton" onclick="saveImage(this)" class="topBarDiv"><center>Save image 💾</center></a>
+
+
 <div id="rotate" class="topBarDiv"><center>Rotate Image ⤾</center></div>
 
 
@@ -263,7 +266,7 @@ pre {
 <label for="Paint">Paint</label><br>
 <input type="radio" id="Blur" name="paintingAction" value="blur" checked>
 <label for="Blur">Blur&nbsp;</label><br>
-<input type="radio" id="Undo" name="paintingAction" value="undo" checked>
+<input type="radio" id="Undo" name="paintingAction" value="undo">
 <label for="Undo">Undo&nbsp;</label>
 </form>
 </center>
@@ -277,8 +280,6 @@ pre {
 <div id="blurAmountDiv" class="topBarDiv"><center> Blur Amount<br>
   <input type="range" min="0" max="150" value="75" class="slider" id="blurAmount"></center>
 </div>
-
-    <a id="saveButton" onclick="saveImage(this)" class="topBarDiv"><center>Save image 💾</center></a>
 </div>
 
 <button id="about">About</button>
