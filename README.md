@@ -14,6 +14,17 @@ Dragging on the image will blur it. You can change your brush size and the inten
 
 **All processing happens directly in the browser- no information is stored or sent anywhere.** 
 
+**All processing happens directly in the browser- no information is stored or sent anywhere.** 
+
+The website works without an internet connection, and it's more secure to use this resource offline.  There are two ways to do this: 
+
+1. Turn on airplane mode after loading it - This way, no third-party services can transmit the images you upload. (Recommended for mobile)
+
+2. [Download] (https://github.com/everestpipkin/image-scrubber/archive/master.zip) the tool from Github, and open index.html locally: This is the safest, but takes a little more effort and is harder to do on mobile.  By clicking the link, you will download a zip file containing all the files necessary to run this on your own system.  Extract, or unzip, the folder, and open the index.html file with a web browser of your choice, and use it using the instructions above.  
+
+The other option, if you're a command-line whiz with git setup, is to clone this repository.  The command to do this: 
+
+    git clone https://github.com/everestpipkin/image-scrubber
 
 
 Bits of this code lifted and adapted from various jsfiddles and libraries --
