@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="manifest.json">
     <title>Image Scrubber</title>
 </head>
 <style>
@@ -227,7 +227,7 @@ pre {
 	// register service worker
 
 	if ('serviceWorker' in navigator) {
-		navigator.serviceWorker.register('sw.js', { scope: '/' }).then(function(reg) {
+		navigator.serviceWorker.register('sw.js', { scope: '/image-scrubber/' }).then(function(reg) {
 
 			if(reg.installing) {
 				console.log('Service worker installing');
