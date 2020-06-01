@@ -218,3 +218,7 @@ pre {
 .custom-file-open{
     cursor: pointer;
 }
+
+.undo-button {
+    margin-top: 5px;
+}

@@ -53,7 +53,8 @@
 <input type="radio" id="Blur" name="paintingAction" value="blur" checked>
 <label for="Blur">Blur&nbsp;</label><br>
 <input type="radio" id="Undo" name="paintingAction" value="undo">
-<label for="Undo">Undo&nbsp;</label>
+<label for="Undo">Undo&nbsp;</label><br>
+<button class="undo-button">Undo Last</button>
 </form>
 </center>
 </div>
@@ -711,6 +712,11 @@ window.addEventListener('keydown', function(evt){
     if ((evt.metaKey || evt.ctrlKey) && evt.keyCode === 90){
         undoLastPath()
     }
+})
+
+document.querySelector('.undo-button').addEventListener('click', function(evt){
+    evt.preventDefault()
+    undoLastPath()
 })
 
 
