@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="manifest" href="scripts/manifest.json">
-    <link rel="apple-touch-icon" href="scrubber_logo_ios_homescreen.png">
     <title>Image Scrubber</title>
 </head>
 <link rel="stylesheet" type="text/css" href="scripts/css.css">
@@ -447,7 +446,7 @@ button.onclick = function () {
 
 
 
-var myImageData, tempImageData, holderImageData, rotating = false;   
+var myImageData, tempImageData, holderImageData, blurredImageData, rotating = false;   
 
 var rotate = function () {
     if (!rotating) {
@@ -456,9 +455,13 @@ var rotate = function () {
         myImageData = new Image();
         tempImageData = new Image();
         rotationImageData = new Image();
+        blurredImageData = new Image();
+
         myImageData.src = canvas.toDataURL();
         tempImageData.src = tempCanvas.toDataURL();
         rotationImageData.src = rotationCanvas.toDataURL();
+        blurredImageData.src = blurredCanvas.toDataURL();
+
         //holderImageData.src = holderCanvas.toDataURL();
 
 
@@ -474,6 +477,8 @@ var rotate = function () {
             holderCanvas.height = cw;
             rotationCanvas.width = ch;
             rotationCanvas.height = cw;
+            blurredCanvas.width = ch;
+            blurredCanvas.height = cw;           
             cw = canvas.width;
             ch = canvas.height;
 
@@ -502,6 +507,14 @@ var rotate = function () {
             rotationCtx.drawImage(rotationImageData, 0, 0);               
             rotationCtx.restore();
 
+            blurredCtx.save();
+            // translate and rotate
+            blurredCtx.translate(cw, ch / cw);
+            blurredCtx.rotate(Math.PI / 2);
+            // draw the previows image, now rotated
+            blurredCtx.drawImage(rotationImageData, 0, 0);               
+            blurredCtx.restore();
+
             //don't need to rotate the holder as it gets cleared anyway. 
             //holderCtx.save();
             // translate and rotate
@@ -514,6 +527,8 @@ var rotate = function () {
             // clear the temporary image
             myImageData = null;
             tempImageData = null;
+            blurredImageData = null;
+
             //holderImageData = null;
             rotating = false;               
         }
