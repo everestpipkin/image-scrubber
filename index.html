@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="manifest" href="scripts/manifest.json">
+    <link rel="apple-touch-icon" href="scrubber_logo_ios_homescreen.png">
     <title>Image Scrubber</title>
 </head>
 <link rel="stylesheet" type="text/css" href="scripts/css.css">
@@ -83,7 +84,7 @@ Click okay, and you can then save the scrubbed image by hitting save or right cl
 
 You can select between painting over the image or blurring it out. Dragging on the image will paint on or blur it. You can change your brush size via the slider. The blur function has built-in pixel shuffling/noise and is fairly secure but sensitive information should be covered with the paint tool.
 
-This tool works offline: you can load the page then turn on airplane mode (or turn off wifi/data) before opening any pictures, or <a href="https://github.com/everestpipkin/image-scrubber/archive/master.zip">download</a> the zipped code, open the folder, and open index.html in a browser with the internet turned off.  
+This tool works offline: on a phone you can load the page then turn on airplane mode (or turn off wifi/data) before opening any pictures. On a computer, <a href="https://github.com/everestpipkin/image-scrubber/archive/master.zip">download</a> the zipped code, open the folder, and open index.html in a browser with the internet turned off.  
 
 <strong>All processing happens directly in the browser- no information is stored or sent anywhere.</strong>
 
@@ -136,7 +137,12 @@ var blurAmount = 50;
 //blur amount needs to be set for the size of the canvas ...
 //100 x 100 is arond 5, 2500 x 2500 is around 100
 //i map this later on in the set canvas size
-//however, it is not linear and i need a better solution that letting people fix it themselves w the slider
+//however, it is not linear and i need a better solution that letting people fix it themselves w the slider to cover detail
+//the best solution is probably to continue to work on the underlying processes before running the blur
+//so even if the blur is removed the image is still fully unrecognizable
+//the program is there for everything but portraits - a picture of a face fullsize is probably still retrievable 
+//idk why anyone would use this tool to anonymize a selfie but the edge case is worth designing for
+//probably the thing is to tie pixelization size to brush size - going to start on that below
 
 
 canvas.addEventListener('mousedown', handleMouseDown);
@@ -641,6 +647,8 @@ var holderArray = []
 }
     return array;
 }
+
+
 //bits of this code lifted and adapted from various jsfiddles and libraries -- 
 //thank you:
 //http://jsfiddle.net/sierawski/4xezb7nL/
