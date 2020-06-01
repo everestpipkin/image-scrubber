@@ -753,23 +753,16 @@ function pixelateCanvas(inCanvas, inCtx, blockSize){
 }
 
 
-function shuffle(array) {
+//not in atm but could add back in if wanted for even more ~security~. honestly not needed though, the shuffle does the work
+function noise(array) {
     let counter = array.length;
 
 
-    // While there are elements in the array
     while (counter > 0) {
-        // Pick a random index
-        //let index = Math.floor(Math.random() * counter);
-
-        // Decrease counter by 1
         counter--;
 
         if (array[counter] != 0){
-        // And swap the last element with it
-        //let temp = array[counter];
-        array[counter] = array[counter + Math.floor(Math.random() * 20)];
-        //array[index] = temp;
+        array[counter] = Math.floor(Math.random() * 255) //array[counter + Math.floor(Math.random() * 20)];
     }
     }
 
@@ -777,6 +770,42 @@ function shuffle(array) {
 }
 
 
+function shuffle(array) {
+
+var holderArray = []
+
+    for(var i = 0, n = array.length; i < n; i += 4) {
+          var red = array[i];
+          var green = array[i + 1];
+          var blue = array[i + 2];
+          //var alpha = array[i + 3];
+
+          if (red+green+blue != 0){
+            //console.log(i)
+            holderArray.push(i);
+          }
+    }
+
+//items[Math.floor(Math.random() * items.length)];
+
+    for(x = 0; x < holderArray.length; x++) {
+
+        //gets a random element within 50 pixels of this one - in the linear array, kind of silly but it works. might want to come back through and do something nicer but its getting blurred anyway so eh
+        if (x<holderArray.length/2){
+            var randomElement = holderArray[x + (Math.floor(Math.random() * 50))];
+        }
+        else {
+            var randomElement = holderArray[x - (Math.floor(Math.random() * 50))];
+        }
+        //console.log(randomElement)
+          array[holderArray[x]] = array[randomElement];
+          array[holderArray[x] + 1] = array[randomElement+1];
+          array[holderArray[x] + 2] = array[randomElement+2];
+          //var alpha = array[i + 3];
+    }
+
+    return array;
+}
 //bits of this code lifted and adapted from various jsfiddles and libraries -- 
 //thank you:
 //http://jsfiddle.net/sierawski/4xezb7nL/
