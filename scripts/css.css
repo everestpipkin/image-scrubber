@@ -218,3 +218,7 @@ pre {
 .custom-file-open{
     cursor: pointer;
 }
+
+#topBar.is-dragover {
+  background-color: #1bc138;
+}

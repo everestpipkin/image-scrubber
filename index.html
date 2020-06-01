@@ -80,13 +80,13 @@ It will remove identifying metadata (<a href="https://en.wikipedia.org/wiki/Exif
 
 Hit the open button to open a photograph. The program will display the data it is removing.
 
-Click okay, and you can then save the scrubbed image by hitting save or right clicking on it and saving it. Maximum size is 2500x2500 pixels - larger images will be scaled down.
+Click okay, and you can then save the scrubbed image by hitting save or right clicking on it and saving it. Maximum size is 2500x2500 pixels — larger images will be scaled down.
 
 You can select between painting over the image or blurring it out. Dragging on the image will paint on or blur it. You can change your brush size via the slider. The blur function has built-in pixel shuffling/noise and is fairly secure but sensitive information should be covered with the paint tool.
 
-This tool works offline: on a phone you can load the page then turn on airplane mode (or turn off wifi/data) before opening any pictures. On a computer, <a href="https://github.com/everestpipkin/image-scrubber/archive/master.zip">download</a> the zipped code, open the folder, and open index.html in a browser with the internet turned off.  
+This tool works offline: on a phone you can load the page then turn on airplane mode (or turn off wifi/data) before opening any pictures. On a computer, <a href="https://github.com/everestpipkin/image-scrubber/archive/master.zip">download</a> the zipped code, open the folder, and open index.html <b>in a browser with the internet turned off.</b>
 
-<strong>All processing happens directly in the browser- no information is stored or sent anywhere.</strong>
+<strong>All processing happens directly in the browser — no information is stored or sent anywhere.</strong>
 
 
 Bug reports or questions to: everest.pipkin@gmail.com
@@ -155,7 +155,6 @@ canvas.addEventListener('touchmove', handleTouchMove);
 canvas.addEventListener('touchend', handleMouseUp);
 canvas.addEventListener('touchcancel', handleMouseUp);
 
-
 var brushSizeDiv = document.getElementById("brushSize");
 brushSizeDiv.onchange = populateBrushSize;
 
@@ -211,18 +210,73 @@ function saveImage(){
   }, 'image/jpeg', 0.8);
 }
 
-document.getElementById("file-input").onchange = function(e) {
+var isAdvancedUpload = function() {
+    var div = document.createElement('div');
+    return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window;
+}();
 
+if (isAdvancedUpload) {
+    var topBar = document.getElementById("topBar");
+    topBar.classList.add('has-advanced-upload');
+}
+
+if (isAdvancedUpload) {
+    //drag-and-drop event listeners
+    var topBar = document.getElementById("topBar");
+    var droppedFile = false;
+
+    topBar.addEventListener('drag', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    });
+    topBar.addEventListener('drag', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    });
+    topBar.addEventListener('dragstart', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    });
+    topBar.addEventListener('dragend', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        topBar.classList.remove('is-dragover');
+    });
+    topBar.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        topBar.classList.add('is-dragover');
+    });
+    topBar.addEventListener('dragenter', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        topBar.classList.add('is-dragover');
+    });
+    topBar.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        topBar.classList.remove('is-dragover');
+    });
+    topBar.addEventListener('drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        topBar.classList.remove('is-dragover');
+        droppedFile =  e.dataTransfer.files[0];
+        uploadFile(null, droppedFile);
+    });
+}
+
+function uploadFile(e, droppedFile) {
     var reader = new FileReader();
-    reader.onload = function(event){
+    reader.onload = function(event) {
         img = new Image();
-        img.onload = function(){
+        img.onload = function() {
             if (img.width < 2500 && img.height < 2500){
                 var canvasScale = 1;
-        }
-        else {
-            var canvasScale = Math.min(2500 / img.width, 2500 / img.height)
-        }
+            }
+            else {
+                var canvasScale = Math.min(2500 / img.width, 2500 / img.height)
+            }
 
             canvas.width = tempCanvas.width = holderCanvas.width = rotationCanvas.width = blurredCanvas.width = img.width*canvasScale;
             canvas.height = tempCanvas.height = holderCanvas.height = rotationCanvas.height = blurredCanvas.height = img.height*canvasScale;
@@ -241,44 +295,51 @@ document.getElementById("file-input").onchange = function(e) {
         }
         img.src = event.target.result;
     }
-    reader.readAsDataURL(e.target.files[0]);    
 
-            filename = document.getElementById("file-input").value;
-            var exifInformationDiv = document.getElementById("exifInformationHolder");
-            var imageScrubberInfo = document.getElementById("imageScrubberInfo");
-            imageScrubberInfo.style.display = "none";
-            exifInformationDiv.style.display = "block";
-            var file = e.target.files[0]
-            if (file && file.name) {
-                EXIF.getData(file, function() {
+    var filePayload = !droppedFile ? e.target.files[0] : droppedFile;
+    reader.readAsDataURL(filePayload);
 
-                    var exifData = JSON.stringify(this.exifdata, null, 4);
-                    if (exifData) {
-                        if (exifData.toString() == "{}"){
-                            exifInformationHolder.innerHTML = "<center>No EXIF data found in image '" + file.name + "'.<br><br></center>";
-                        var btn = document.createElement("BUTTON");
-                        btn.id="continueButton";
-                        btn.innerHTML = "Continue to edit image";
-                        btn.onclick = goToBlur;
-                        exifInformationHolder.appendChild(btn)
-                        }
-                        else{
-                        var exifScrollDiv = document.createElement("div");
-                        exifScrollDiv.id = "exifScrollDiv"
-                        exifScrollDiv.innerHTML =  file.name + "<pre>" + exifData + "</pre>";
-                        exifInformationHolder.innerHTML = "Exif Data:<br><br>"
-                        exifInformationHolder.appendChild(exifScrollDiv)
-                        
-                        var btn = document.createElement("BUTTON");
-                        btn.id="continueButtonExif";
-                        btn.innerHTML = "Scrub Exif Data";
-                        btn.onclick = scrubData;
-                        exifInformationHolder.appendChild(btn)
-                    }
-                    }
-                });
+    filename = !droppedFile ? document.getElementById("file-input").value : filePayload.name;
+    var exifInformationDiv = document.getElementById("exifInformationHolder");
+    var imageScrubberInfo = document.getElementById("imageScrubberInfo");
+    imageScrubberInfo.style.display = "none";
+    exifInformationDiv.style.display = "block";
+
+    var file = filePayload;
+    if (file && file.name) {
+        fileName = file.name
+        EXIF.getData(file, function() {
+            var exifData = JSON.stringify(this.exifdata, null, 4);
+            if (exifData) {
+                if (exifData.toString() == "{}") {
+                    exifInformationHolder.innerHTML = "<center>No EXIF data found in image '" + file.name + "'.<br><br></center>";
+                    var btn = document.createElement("BUTTON");
+                    btn.id="continueButton";
+                    btn.innerHTML = "Continue to edit image";
+                    btn.onclick = goToBlur;
+                    exifInformationHolder.appendChild(btn)
+                }
+                else {
+                    var exifScrollDiv = document.createElement("div");
+                    exifScrollDiv.id = "exifScrollDiv"
+                    exifScrollDiv.innerHTML =  file.name + "<pre>" + exifData + "</pre>";
+                    exifInformationHolder.innerHTML = "Exif Data:<br><br>"
+                    exifInformationHolder.appendChild(exifScrollDiv)
+
+                    var btn = document.createElement("BUTTON");
+                    btn.id="continueButtonExif";
+                    btn.innerHTML = "Scrub Exif Data";
+                    btn.onclick = scrubData;
+                    exifInformationHolder.appendChild(btn)
+                }
             }
-        }
+        });
+    }
+}
+
+document.getElementById("file-input").onchange = function(e) {
+    uploadFile(e, null);
+}
 
 function scrubData(){
     document.getElementById("exifInformationHolder").style.display = "none";
