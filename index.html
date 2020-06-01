@@ -134,6 +134,10 @@ var blurredCtx = blurredCanvas.getContext("2d");
 var brushSize = 50;
 var blurAmount = 50;
 
+// keep the paths the user draws here so we can undo them easily
+// (reset on every new image load)
+var drawnPaths = []
+
 //blur amount needs to be set for the size of the canvas ...
 //100 x 100 is arond 5, 2500 x 2500 is around 100
 //i map this later on in the set canvas size
@@ -212,6 +216,9 @@ function saveImage(){
 }
 
 document.getElementById("file-input").onchange = function(e) {
+    
+    // reset path history
+    drawnPaths = []
 
     var reader = new FileReader();
     reader.onload = function(event){
@@ -293,6 +300,16 @@ function goToBlur(){
 function handleMouseDown(e) {
     e.preventDefault();
     e.stopPropagation();
+    
+    // if we're not undoing, start a new entry in the path history
+    if (painting !== 'undo'){
+        drawnPaths.push({ 
+            painting: painting, 
+            brushSize: brushSize, 
+            blurAmount: blurAmount,
+            points: [] 
+        })
+    }
 
     holderCtx.save();
     holderCtx.clearRect(0, 0, holderCanvas.width, holderCanvas.height);
@@ -323,6 +340,11 @@ function handleMouseMove(e) {
     e.stopPropagation();
     mouseX = pos.x; 
     mouseY = pos.y; 
+    
+    // add to path history
+    if (drawnPaths.length){
+        drawnPaths[drawnPaths.length - 1].points.push({ x: mouseX, y: mouseY })
+    }
 
     ctx.beginPath();
     ctx.arc(mouseX, mouseY, brushSize, 0, Math.PI * 2);
@@ -385,11 +407,20 @@ function handleTouchMove(e) {
 function handleMouseUp(e) {
     e.preventDefault();
     e.stopPropagation();
+    updateImage()
+}
+
+function updateImage(opts = {}){
     isDown = false;
-    if (painting != "paint"){
-        var tempBlurAmount = blurAmount;
-        if (painting == "undo"){
-            blurAmount = 0;
+        
+    // local version to account for overrides
+    var _painting = opts.hasOwnProperty('painting') ? opts.painting : painting
+    var _blurAmount = opts.hasOwnProperty('blurAmount') ? opts.blurAmount : blurAmount
+    
+    if (_painting != "paint"){
+        // var tempBlurAmount = blurAmount;
+        if (_painting == "undo"){
+            _blurAmount = 0;
         }
         //blurredCtx.clearRect(0, 0, canvas.width, canvas.height);
         blurredCtx.drawImage(rotationCanvas, 0, 0);
@@ -399,10 +430,11 @@ function handleMouseUp(e) {
         //tempCtx.drawImage(rotationCanvas, 0, 0);
         //tempCtx.restore();
         //pixelate function is here
-        if (painting != "undo"){
+        if (_painting != "undo"){
         pixelateCanvas(blurredCanvas, blurredCtx, 10);
         }
-        stackBlurCanvasRGBA("blurredCanvas", 0, 0, blurredCanvas.width, blurredCanvas.height, blurAmount);
+        
+        stackBlurCanvasRGBA("blurredCanvas", 0, 0, blurredCanvas.width, blurredCanvas.height, _blurAmount);
         tempCtx.save();
         tempCtx.globalCompositeOperation = 'source-in';
         tempCtx.drawImage(blurredCanvas, 0, 0);
@@ -414,7 +446,6 @@ function handleMouseUp(e) {
         ctx.globalCompositeOperation = "destination-over";
         ctx.drawImage(holderCanvas, 0, 0);
         ctx.restore();
-        blurAmount = tempBlurAmount;
     }
 }
 
@@ -647,6 +678,40 @@ var holderArray = []
 }
     return array;
 }
+
+function undoLastPath(){
+    var lastPath = drawnPaths.pop()
+    // nothing in the path history
+    if (!lastPath || !lastPath.points){
+        console.warn('nothing to undo')
+        return
+    }
+    
+    // draw undo arcs over the selected area
+    lastPath.points.forEach(function(point) {
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, lastPath.brushSize, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.fill();
+        tempCtx.beginPath();
+        tempCtx.arc(point.x, point.y, lastPath.brushSize, 0, Math.PI * 2);
+        tempCtx.closePath();
+        tempCtx.fill();
+    })
+    updateImage({ 
+        painting: lastPath.painting !== 'undo' ? 'undo' : 'blur',
+        brushSize: lastPath.brushSize, 
+        blurAmount: lastPath.blurAmount 
+    })
+}
+
+// ctrl/cmd-Z
+window.addEventListener('keydown', function(evt){
+    // keyCode 90 === z
+    if ((evt.metaKey || evt.ctrlKey) && evt.keyCode === 90){
+        undoLastPath()
+    }
+})
 
 
 //bits of this code lifted and adapted from various jsfiddles and libraries -- 
