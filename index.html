@@ -274,7 +274,7 @@ Hit the open button to open a photograph. The program will display the data it i
 
 Click okay, and you can then save the scrubbed image by hitting save or right clicking on it and saving it. Maximum size is 2500x2500 pixels - larger images will be scaled down.
 
-You can select between painting over the image or blurring it out. Dragging on the image will paint on or blur it. You can change your brush size via the slider. The blur function has built-in pixelization and noise.
+You can select between painting over the image or blurring it out. Dragging on the image will paint on or blur it. You can change your brush size via the slider. The blur function has built-in pixelization and noise and is fairly irreversible - but very sensitive information should be covered with the paint tool.
 
 <strong>All processing happens directly in the browser- no information is stored or sent anywhere.</strong>
 
@@ -344,12 +344,30 @@ blurAmountDiv.onchange = populateBlurAmount;
 
 function populateBrushSize(){
     brushSize = Math.floor(this.value * canvas.width/800);
+    setCursor();
 }
 
 function populateBlurAmount(){
     blurAmount = Math.floor(this.value);
 }
 
+
+function setCursor(){
+
+    var cursorCanvas = document.createElement('canvas');
+    var scaleX = canvas.getBoundingClientRect().width / canvas.width;
+    cursorCanvas.width = ((brushSize*2)*scaleX);
+    cursorCanvas.height = ((brushSize*2)*scaleX);
+    var cursorCtx = cursorCanvas.getContext('2d');
+
+    cursorCtx.beginPath();
+    cursorCtx.arc(cursorCanvas.width / 2, cursorCanvas.height / 2, (brushSize)*scaleX, 0, Math.PI * 2);
+    cursorCtx.closePath();
+    cursorCtx.stroke(); 
+    var cursorDataURL = cursorCanvas.toDataURL();
+    canvas.style.cursor = "url("+cursorDataURL+") " + cursorCanvas.width / 2 +" "+ cursorCanvas.height / 2 + ", auto";
+
+}
 // get list of radio buttons with name 'paintForm'
 var sz = document.forms['paintForm'].elements['paintingAction'];
 
@@ -391,6 +409,7 @@ document.getElementById("file-input").onchange = function(e) {
 
             var biggerDimension = Math.max(canvas.width, canvas.height);
 
+            setCursor()
 
             // i need to come back to this - blur amount and brush size deviate at big and small images
 
@@ -692,7 +711,7 @@ function pixelateCanvas(inCanvas, inCtx, blockSize){
     // so - smaller canvases need to be bigger block size, because they get too small to render anything
     //a 10x10 pixel image should be around .5
     //a 2500x2500 should be around 0.03
-    //just gonna use a map function - see above
+    //just gonna use a map function for now- see above
 
     var biggerDimension = Math.max(inCanvas.width, inCanvas.height);
 
@@ -749,7 +768,7 @@ function shuffle(array) {
         if (array[counter] != 0){
         // And swap the last element with it
         //let temp = array[counter];
-        array[counter] = array[counter + Math.floor(Math.random() * 30)];
+        array[counter] = array[counter + Math.floor(Math.random() * 20)];
         //array[index] = temp;
     }
     }
