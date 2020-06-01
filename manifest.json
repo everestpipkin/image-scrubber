@@ -1,0 +1,22 @@
+{
+  "short_name": "Image scrubber",
+  "name": "Scrubber",
+  "start_url": "/",
+  "background_color": "#fff",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#fff",
+  "icons": [
+    {
+      "src": "scrubber_logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },{
+      "src": "scrubber_logo.svg",
+      "sizes": "150x150",
+      "type": "image/svg+xml",
+      "purpose": "maskable any"
+    }
+  ]
+}
