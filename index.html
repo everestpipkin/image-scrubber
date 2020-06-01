@@ -410,7 +410,7 @@ function saveImage(){
     var nameWithoutPath = filename.replace(/.*[\\/]([^\\/]+)$/, '$1');
     var nameWithoutExtension = nameWithoutPath.replace(/\.[^.]*$/, '');
 
-    link.download = nameWithoutExtension + '.jpg';
+    link.download = nameWithoutExtension + '_scrubbed.jpg';
     link.href = URL.createObjectURL(blob);
     link.click();
   }, 'image/jpeg', 0.8);
