@@ -577,7 +577,7 @@ function handleMouseUp(e) {
         tempCtx.globalCompositeOperation = "source-in";
         tempCtx.drawImage(rotationCanvas, 0, 0);
         tempCtx.restore();
-        //pixelate function goes here
+        //pixelate function is here
         if (painting != "undo"){
         pixelateCanvas(tempCanvas, tempCtx, 10);
         }
@@ -741,6 +741,7 @@ function pixelateCanvas(inCanvas, inCtx, blockSize){
 
     pixelArray = offscreenCtx.getImageData(0, 0, w, h);
     pixelArray.data = shuffle(pixelArray.data)
+    //pixelArray.data = noise(pixelArray.data) // this induces colorful noise but its unneeded i think
     //console.log(pixelArray.data)
     offscreenCtx.putImageData(pixelArray, 0,0);
 
