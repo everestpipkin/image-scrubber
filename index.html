@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="manifest" href="manifest.json">
     <title>Image Scrubber</title>
 </head>
 <style>
@@ -222,6 +223,27 @@ pre {
     cursor: pointer;
 }
 </style>
+<script>
+	// register service worker
+
+	if ('serviceWorker' in navigator) {
+		navigator.serviceWorker.register('sw.js', { scope: '/image-scrubber/' }).then(function(reg) {
+
+			if(reg.installing) {
+				console.log('Service worker installing');
+			} else if(reg.waiting) {
+				console.log('Service worker installed');
+			} else if(reg.active) {
+				console.log('Service worker active');
+			}
+
+		}).catch(function(error) {
+			// registration failed
+			console.log('Registration failed with ' + error);
+		});
+	}
+
+</script>
 <body>
 
 <div id="topBar">
