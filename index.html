@@ -790,20 +790,22 @@ var holderArray = []
 
     for(x = 0; x < holderArray.length; x++) {
 
-        //gets a random element within 50 pixels of this one - in the linear array, kind of silly but it works. might want to come back through and do something nicer but its getting blurred anyway so eh
-        if (x<holderArray.length/2){
-            var randomElement = holderArray[x + (Math.floor(Math.random() * 50))];
-        }
-        else {
-            var randomElement = holderArray[x - (Math.floor(Math.random() * 50))];
-        }
-        //console.log(randomElement)
-          array[holderArray[x]] = array[randomElement];
-          array[holderArray[x] + 1] = array[randomElement+1];
-          array[holderArray[x] + 2] = array[randomElement+2];
-          //var alpha = array[i + 3];
-    }
+        //gets a random element within canvas.width/75 pixels of this one - in the linear array, kind of silly but it works! might want to come back through and do something nicer but its getting blurred anyway so eh
+    
+            var randomElement = x + (Math.floor(Math.random() * (canvas.width/75)));
+            //console.log(randomElement, holderArray.length)
+            if (randomElement > holderArray.length || randomElement < 0){
+                randomElement = x;
+            }
+        
+            //console.log(randomElement, holderArray.length)
 
+        //console.log(randomElement)
+          array[holderArray[x]] = array[holderArray[randomElement]];
+          array[holderArray[x] + 1] = array[holderArray[randomElement] +1];
+          array[holderArray[x] + 2] = array[holderArray[randomElement] +2];
+          //var alpha = array[i + 3];
+}
     return array;
 }
 //bits of this code lifted and adapted from various jsfiddles and libraries -- 
