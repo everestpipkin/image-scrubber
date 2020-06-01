@@ -274,21 +274,11 @@ Hit the open button to open a photograph. The program will display the data it i
 
 Click okay, and you can then save the scrubbed image by hitting save or right clicking on it and saving it. Maximum size is 2500x2500 pixels - larger images will be scaled down.
 
-You can select between painting over the image or blurring it out. Dragging on the image will paint on or blur it. You can change your brush size via the slider. The blur function has built-in pixelization and noise and is fairly irreversible - but very sensitive information should be covered with the paint tool.
+You can select between painting over the image or blurring it out. Dragging on the image will paint on or blur it. You can change your brush size via the slider. The blur function has built-in pixelization, shuffling and noise and is fairly secure but very sensitive information should be covered with the paint tool.
+
+This tool works offline: you can load the page then turn on airplane mode (or turn off wifi/data) before opening any pictures, or (<a href="https://github.com/everestpipkin/image-scrubber/archive/master.zip">download</a> the zipped code, open the folder, and open index.html in a browser with the internet turned off.  
 
 <strong>All processing happens directly in the browser- no information is stored or sent anywhere.</strong>
-
-This website also works offline, and there are two such ways to use it. 
-
-The first is to turn on airplane mode (or turn off wifi/mobile data) before uploading any pictures. 
-
-The second (harder on mobile) is to (<a href="https://github.com/everestpipkin/image-scrubber/archive/master.zip">download</a> the repository, extract/unzip the folder, and run index.html in a web browser of your choice.  
-
-Alternatively, if you know how to use the git CLI and have it set up, you can clone this repo by using the following command: 
-git clone https://github.com/everestpipkin/image-scrubber 
-instead of downloading from the link.
-
-Once again, turn on airplane mode or turn off connectivity before actually using the tool.
 
 
 Bug reports or questions to: everest.pipkin@gmail.com
@@ -805,7 +795,7 @@ var holderArray = []
 
         //gets a random element within canvas.width/75 pixels of this one - in the linear array, kind of silly but it works! might want to come back through and do something nicer but its getting blurred anyway so eh
     
-            var randomElement = x + (Math.floor(Math.random() * (canvas.width/75)));
+            var randomElement = x + (Math.floor(Math.random() * (canvas.width/60)));
             //console.log(randomElement, holderArray.length)
             if (randomElement > holderArray.length || randomElement < 0){
                 randomElement = x;
