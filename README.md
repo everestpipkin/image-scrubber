@@ -18,9 +18,9 @@ The website works without an internet connection, and it's more secure to use th
 
 1. Turn on airplane mode after loading it - This way, no third-party services can transmit the images you upload. (Recommended for mobile)
 
-2. [Download](https://github.com/everestpipkin/image-scrubber/archive/master.zip) the tool from Github, and open index.html locally: This is the safest, but takes a little more effort and is harder to do on mobile.  By clicking the link, you will download a zip file containing all the files necessary to run this on your own system.  Extract, or unzip, the folder, and open the index.html file with a web browser of your choice, and use it using the instructions above.  
+2. [Download](https://github.com/everestpipkin/image-scrubber/archive/master.zip) the tool from Github, and open index.html locally: This is the safest, but takes a little more effort and is harder to do on mobile.  By clicking the link, you will download a zip file containing all the files necessary to run this on your own system.  Extract, or unzip, the folder, and open the index.html file with a web browser of your choice, and use it using the instructions above.  Just to be safe, still turn off data/internet before uploading any photos to the tool.
 
-The other option, if you're a command-line whiz with git setup, is to clone this repository.  The command to do this: 
+If you're a command-line whiz with git set up, you can clone this repository instead of downloading the zip.  The command to do so: 
 
     git clone https://github.com/everestpipkin/image-scrubber
 
