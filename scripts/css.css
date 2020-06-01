@@ -151,6 +151,12 @@
     display: none;
 }
 
+#blurredCanvas {
+    position:absolute;
+    top:-1000px;
+    display: none;
+}
+
 #about{
   position:absolute;
   bottom: 10px;

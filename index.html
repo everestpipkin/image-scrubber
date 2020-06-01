@@ -103,6 +103,7 @@ If you want other ways to cover your digital footprint, I've assembled a list of
     <canvas id="tempCanvas"></canvas>
     <canvas id="holderCanvas"></canvas>
     <canvas id="rotationCanvas"></canvas>
+    <canvas id="blurredCanvas"></canvas>
 
     <script type="text/javascript" src="scripts/exif.js"></script>
     <script type="text/javascript" src="scripts/stackblur.js"></script>
@@ -126,6 +127,9 @@ var holderCtx = holderCanvas.getContext("2d");
 
 var rotationCanvas = document.getElementById("rotationCanvas");
 var rotationCtx = rotationCanvas.getContext("2d");
+
+var blurredCanvas = document.getElementById("blurredCanvas");
+var blurredCtx = blurredCanvas.getContext("2d");
 
 var brushSize = 50;
 var blurAmount = 50;
@@ -215,8 +219,8 @@ document.getElementById("file-input").onchange = function(e) {
             var canvasScale = Math.min(2500 / img.width, 2500 / img.height)
         }
 
-            canvas.width = tempCanvas.width = holderCanvas.width = rotationCanvas.width = img.width*canvasScale;
-            canvas.height = tempCanvas.height = holderCanvas.height = rotationCanvas.height = img.height*canvasScale;
+            canvas.width = tempCanvas.width = holderCanvas.width = rotationCanvas.width = blurredCanvas.width = img.width*canvasScale;
+            canvas.height = tempCanvas.height = holderCanvas.height = rotationCanvas.height = blurredCanvas.height = img.height*canvasScale;
             ctx.drawImage(img,0,0,img.width*canvasScale,img.height*canvasScale);
             rotationCtx.drawImage(img,0,0,img.width*canvasScale,img.height*canvasScale);
 
@@ -382,15 +386,23 @@ function handleMouseUp(e) {
         if (painting == "undo"){
             blurAmount = 0;
         }
-        tempCtx.save();
-        tempCtx.globalCompositeOperation = "source-in";
-        tempCtx.drawImage(rotationCanvas, 0, 0);
-        tempCtx.restore();
+        //blurredCtx.clearRect(0, 0, canvas.width, canvas.height);
+        blurredCtx.drawImage(rotationCanvas, 0, 0);
+
+        //tempCtx.save();
+        //tempCtx.globalCompositeOperation = "source-in";
+        //tempCtx.drawImage(rotationCanvas, 0, 0);
+        //tempCtx.restore();
         //pixelate function is here
         if (painting != "undo"){
-        pixelateCanvas(tempCanvas, tempCtx, 10);
+        pixelateCanvas(blurredCanvas, blurredCtx, 10);
         }
-        stackBlurCanvasRGBA("tempCanvas", 0, 0, tempCanvas.width, tempCanvas.height, blurAmount);
+        stackBlurCanvasRGBA("blurredCanvas", 0, 0, blurredCanvas.width, blurredCanvas.height, blurAmount);
+        tempCtx.save();
+        tempCtx.globalCompositeOperation = 'source-in';
+        tempCtx.drawImage(blurredCanvas, 0, 0);
+        tempCtx.restore();
+
         ctx.save();
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(tempCanvas, 0, 0);
