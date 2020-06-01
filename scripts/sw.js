@@ -1,7 +1,8 @@
 const filesToCache = [
 	'/image-scrubber/',
-	'/image-scrubber/exif.js',
-	'/image-scrubber/stackblur.js'
+	'/image-scrubber/scripts/exif.js',
+	'/image-scrubber/scripts/stackblur.js',
+	'/image-scrubber/scripts/css.css',
 ];
 
 const cacheName = 'offline';
