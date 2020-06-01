@@ -4,231 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="scripts/manifest.json">
     <link rel="apple-touch-icon" href="scrubber_logo_ios_homescreen.png">
     <title>Image Scrubber</title>
 </head>
-<style>
-
-#imageCanvas{
-    position: absolute;
-    top: 56%;
-    left: 50%;
-    transform: translateX(-50%) translateY(-50%);
-    max-width: 100%;
-    max-height: 82%;
-    z-index: -1;
-    cursor: crosshair;
-}
-
-#topBar{
-    width:100%;
-    height:12vh;
-    border: 1px solid black;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    box-sizing: border-box;
-}
-
-
-.topBarDiv{
-    width: 18vw;
-    height: 12vh;
-    border-left: 1px solid #ccc;
-    border-right: 1px solid #ccc;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-
-#file-input{
-    flex-direction: row;
-}
-
-#saveButton{
-    padding-top: 2px;
-    cursor: pointer;
-
-}
-
-#openDiv{
-    padding-top: 2px;
-}
-
-#exifInformationHolder{
-    padding: 10px;
-    border: 1px solid black;
-    position: absolute;
-    left: 0;
-    right: 0;
-    margin-right: auto;
-    margin-left: auto;
-    max-width: 70%;
-    max-width: 600px;
-    max-height: 85%;
-    background-color: white;
-    display: none;
-    z-index: 2;
-
-    position: absolute;
-    top: 55%;
-    transform: translateY(-50%);
-    max-height: 88%;
-}
-
-#imageScrubberInfo{
-    position: absolute;
-    left: 0;
-    right: 0;
-    margin-right: auto;
-    margin-left: auto;
-    padding: 10px;
-    width: 80%;
-    max-width: 600px;
-    max-height: 88%;
-    background-color: white;
-    display: block;
-    z-index: 3;
-    font-size: 14px;
-    overflow: auto;
-    box-sizing: border-box;
-}
-
-
-@media (max-width: 800px) {
-    #imageScrubberInfo {
-        max-height: 75%;
-    }
-
-
- #topBar {
-    flex-wrap: wrap;
-    height:20vh;
-    align-items: flex-start;
-  }
-
-
-.topBarDiv{
-    width: 33vw;
-    height: 8vh;
-    max-height:10vh;
-    border: 0px solid #ccc;
-    border-left: 0px solid #ccc;
-    border-right: 0px solid #ccc;
-
-}
-
-
-#imageCanvas{
-    position: absolute;
-    top: 58%;
-    max-height: 75%;
-}
-
-#continueButtonExif{
-    position: absolute;
-    bottom: 10%;
-    left: 50%;
-    transform: translateX(-50%) translateY(-50%);
-}
-}
-
-#exifScrollDiv{
-    position: inline-block;
-    height: 75vh;
-    max-height: 75vh;
-    overflow-y: auto;
-
-}
-
-#tempCanvas {
-    position:absolute;
-    top:-1000px;
-    display: none;
-}
-
-#holderCanvas {
-    position:absolute;
-    top:-1000px;
-    display: none;
-}
-
-#rotationCanvas {
-    position:absolute;
-    top:-1000px;
-    display: none;
-}
-
-#about{
-  position:absolute;
-  bottom: 10px;
-  right: 10px;
-  z-index: 20;
-
-}
-
-body{
-    font-family: Courier;
-    margin: 0;
-    padding: 0;
-    font-size: 12px;
-    overflow: hidden;
-}
-
-button{
-font-family: Courier;
-    font-size: 12px;
-}
-
-#continueButton, #continueButtonExif{
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 40%;
-}
-
-
-input[type="file"] {
-    display: none;
-}
-
-.file-open {
-    border: 1px solid #ccc;
-    display: inline-block;
-    padding: 6px 12px;
-    cursor: pointer;
-}
-
-/* The slider itself */
-.slider {
-  width: 95%; /* Full-width */
-}
-
-pre {
- white-space: pre-wrap;       /* css-3 */
- white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
- white-space: -pre-wrap;      /* Opera 4-6 */
- white-space: -o-pre-wrap;    /* Opera 7 */
- word-wrap: break-word;       /* Internet Explorer 5.5+ */
-
-}
-
-#rotate{
-        cursor: pointer;
-}
-
-.custom-file-open{
-    cursor: pointer;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="scripts/css.css">
 <script>
 	// register service worker
 
 	if ('serviceWorker' in navigator) {
-		navigator.serviceWorker.register('sw.js', { scope: '/image-scrubber/' }).then(function(reg) {
+		navigator.serviceWorker.register('scripts/sw.js', { scope: '/image-scrubber/' }).then(function(reg) {
 
 			if(reg.installing) {
 				console.log('Service worker installing');
@@ -319,8 +104,8 @@ If you want other ways to cover your digital footprint, I've assembled a list of
     <canvas id="holderCanvas"></canvas>
     <canvas id="rotationCanvas"></canvas>
 
-    <script type="text/javascript" src="exif.js"></script>
-    <script type="text/javascript" src="stackblur.js"></script>
+    <script type="text/javascript" src="scripts/exif.js"></script>
+    <script type="text/javascript" src="scripts/stackblur.js"></script>
 
     <script>
 
@@ -348,6 +133,7 @@ var blurAmount = 50;
 //blur amount needs to be set for the size of the canvas ...
 //100 x 100 is arond 5, 2500 x 2500 is around 100
 //i map this later on in the set canvas size
+//however, it is not linear and i need a better solution that letting people fix it themselves w the slider
 
 
 canvas.addEventListener('mousedown', handleMouseDown);
@@ -399,7 +185,6 @@ var sz = document.forms['paintForm'].elements['paintingAction'];
 // loop through list
 for (var i=0, len=sz.length; i<len; i++) {
     sz[i].onclick = function() { 
-        //console.log(this.value)
         painting = this.value;
     };
 }
@@ -429,7 +214,6 @@ document.getElementById("file-input").onchange = function(e) {
         else {
             var canvasScale = Math.min(2500 / img.width, 2500 / img.height)
         }
-            //console.log(canvasScale)
 
             canvas.width = tempCanvas.width = holderCanvas.width = rotationCanvas.width = img.width*canvasScale;
             canvas.height = tempCanvas.height = holderCanvas.height = rotationCanvas.height = img.height*canvasScale;
@@ -451,7 +235,6 @@ document.getElementById("file-input").onchange = function(e) {
     reader.readAsDataURL(e.target.files[0]);    
 
             filename = document.getElementById("file-input").value;
-            //console.log(e.target)
             var exifInformationDiv = document.getElementById("exifInformationHolder");
             var imageScrubberInfo = document.getElementById("imageScrubberInfo");
             imageScrubberInfo.style.display = "none";
@@ -462,7 +245,6 @@ document.getElementById("file-input").onchange = function(e) {
 
                     var exifData = JSON.stringify(this.exifdata, null, 4);
                     if (exifData) {
-                        //console.log(exifData)
                         if (exifData.toString() == "{}"){
                             exifInformationHolder.innerHTML = "<center>No EXIF data found in image '" + file.name + "'.<br><br></center>";
                         var btn = document.createElement("BUTTON");
@@ -474,7 +256,6 @@ document.getElementById("file-input").onchange = function(e) {
                         else{
                         var exifScrollDiv = document.createElement("div");
                         exifScrollDiv.id = "exifScrollDiv"
-                        //var exifScrollDiv = document.getElementById("exifScrollDiv");
                         exifScrollDiv.innerHTML =  file.name + "<pre>" + exifData + "</pre>";
                         exifInformationHolder.innerHTML = "Exif Data:<br><br>"
                         exifInformationHolder.appendChild(exifScrollDiv)
@@ -501,7 +282,6 @@ function goToBlur(){
 
 
 function handleMouseDown(e) {
-    //console.log(e)
     e.preventDefault();
     e.stopPropagation();
 
@@ -514,7 +294,7 @@ function handleMouseDown(e) {
     isDown = true;
 }
 
-//weird bug where it doesn't blur / crashes if you leave w mouse pressed, fix soon
+//bug where it doesn't blur / crashes if you leave the canvas w mouse pressed, fix soon
 function handleMouseOut(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -612,7 +392,6 @@ function handleMouseUp(e) {
         }
         stackBlurCanvasRGBA("tempCanvas", 0, 0, tempCanvas.width, tempCanvas.height, blurAmount);
         ctx.save();
-        //ctx.globalCompositeOperation = "screen";
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(tempCanvas, 0, 0);
         ctx.globalCompositeOperation = "destination-over";
@@ -626,18 +405,10 @@ function handleMouseUp(e) {
 
 function getMousePos(canvas, evt) {
     var rect = canvas.getBoundingClientRect();
-    //console.log(rect);
     return {
         x: (evt.clientX - rect.left) / (rect.right - rect.left) * canvas.width,
         y: (evt.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height
     };
-}
-
-
-var button = document.getElementById("rotate");
-button.onclick = function () {
-    // rotate the canvas 90 degrees each time the button is pressed
-    rotate();
 }
 
 
@@ -655,6 +426,13 @@ button.onclick = function () {
     }
 
 }
+
+// rotate the canvas 90 degrees each time the button is pressed
+var button = document.getElementById("rotate");
+button.onclick = function () {
+    rotate();
+}
+
 
 
 var myImageData, tempImageData, holderImageData, rotating = false;   
@@ -712,6 +490,7 @@ var rotate = function () {
             rotationCtx.drawImage(rotationImageData, 0, 0);               
             rotationCtx.restore();
 
+            //don't need to rotate the holder as it gets cleared anyway. 
             //holderCtx.save();
             // translate and rotate
             //holderCtx.translate(cw, ch / cw);
@@ -739,12 +518,13 @@ function pixelateCanvas(inCanvas, inCtx, blockSize){
 
     // so - smaller canvases need to be bigger block size, because they get too small to render anything
     //a 10x10 pixel image should be around .5
-    //a 2500x2500 should be around 0.03
+    //a 2500x2500 should be around 0.06
     //just gonna use a map function for now- see above
+    //this could use some attention later
 
     var biggerDimension = Math.max(inCanvas.width, inCanvas.height);
 
-    var size = scale(biggerDimension, 10, 2500, 0.5, 0.06); // 150
+    var size = scale(biggerDimension, 10, 2500, 0.5, 0.06); 
     //console.log(size);
     w = inCanvas.width * size;
     h = inCanvas.height * size;
@@ -756,7 +536,8 @@ function pixelateCanvas(inCanvas, inCtx, blockSize){
 
     var offscreenCtx = offscreenCanvas.getContext('2d');
 
-    // turn off image aliasing
+    // turn off image aliasing for a pixelized look
+    // not currently working BUT the aliasing is confusing to blur reversal tech so ehh maybe i keep it broken?
     offscreenCtx.msImageSmoothingEnabled = false;
     offscreenCtx.mozImageSmoothingEnabled = false;
     offscreenCtx.webkitImageSmoothingEnabled = false;
@@ -771,7 +552,7 @@ function pixelateCanvas(inCanvas, inCtx, blockSize){
     pixelArray = offscreenCtx.getImageData(0, 0, w, h);
     pixelArray.data = shuffle(pixelArray.data)
     //pixelArray.data = noise(pixelArray.data) // this induces colorful noise but its unneeded i think
-    //console.log(pixelArray.data)
+
     offscreenCtx.putImageData(pixelArray, 0,0);
 
     // enlarge the minimized image to full size and draw to main canvas  
@@ -783,7 +564,8 @@ function pixelateCanvas(inCanvas, inCtx, blockSize){
 }
 
 
-//not in atm but could add back in if wanted for even more ~security~. honestly not needed though, the shuffle does the work
+//not in atm but could add back in if wanted for even more ~security~
+//just induces some colorful noise in the blur
 function noise(array) {
     let counter = array.length;
 
@@ -811,26 +593,20 @@ var holderArray = []
           //var alpha = array[i + 3];
 
           if (red+green+blue != 0){
-            //console.log(i)
             holderArray.push(i);
           }
     }
 
-//items[Math.floor(Math.random() * items.length)];
-
     for(x = 0; x < holderArray.length; x++) {
 
-        //gets a random element within canvas.width/75 pixels of this one - in the linear array, kind of silly but it works! might want to come back through and do something nicer but its getting blurred anyway so eh
+        //gets a random element within canvas.width/60 pixels of this one - in the linear pixel array, its kind of silly but it works! always skews images to drift right. might want to come back through and do something nicer but its getting blurred anyway so eh
     
             var randomElement = x + (Math.floor(Math.random() * (canvas.width/60)));
-            //console.log(randomElement, holderArray.length)
+
             if (randomElement > holderArray.length || randomElement < 0){
                 randomElement = x;
             }
-        
-            //console.log(randomElement, holderArray.length)
 
-        //console.log(randomElement)
           array[holderArray[x]] = array[holderArray[randomElement]];
           array[holderArray[x] + 1] = array[holderArray[randomElement] +1];
           array[holderArray[x] + 2] = array[holderArray[randomElement] +2];
