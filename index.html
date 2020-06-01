@@ -406,7 +406,11 @@ for (var i=0, len=sz.length; i<len; i++) {
 function saveImage(){
   document.getElementById('imageCanvas').toBlob(function (blob) {
     var link = document.createElement('a');
-    link.download = filename;
+
+    var nameWithoutPath = filename.replace(/.*[\\/]([^\\/]+)$/, '$1');
+    var nameWithoutExtension = nameWithoutPath.replace(/\.[^.]*$/, '');
+
+    link.download = nameWithoutExtension + '.jpg';
     link.href = URL.createObjectURL(blob);
     link.click();
   }, 'image/jpeg', 0.8);
