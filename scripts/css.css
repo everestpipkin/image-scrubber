@@ -203,3 +203,7 @@ pre {
 .controlButton:focus {
     background: #ccc;
 }
+
+.customFileOpen {
+    cursor: copy;
+}
