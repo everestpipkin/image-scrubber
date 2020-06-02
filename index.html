@@ -134,6 +134,10 @@ var rotationCtx = rotationCanvas.getContext("2d");
 var blurredCanvas = document.getElementById("blurredCanvas");
 var blurredCtx = blurredCanvas.getContext("2d");
 
+// keep the paths the user draws here so we can undo them easily
+// (reset on every new image load)
+var pathHistory = []
+
 // these are placeholders - i map this later on in the set canvas size
 var brushSize = blurAmount = 50;
 
