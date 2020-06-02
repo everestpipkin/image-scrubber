@@ -62,11 +62,11 @@
 
 
 <div id="brushSizeDiv" class="topBarDiv"><center> Brush Size<br>
-  <input type="range" min="1" max="100" value="50" class="slider" id="brushSize"></center>
+  <input type="range" min="10" max="100" value="55" class="slider" id="brushSizeSlider"></center>
 </div>
 
 <div id="blurAmountDiv" class="topBarDiv"><center> Blur Radius<br>
-  <input type="range" min="20" max="130" value="75" class="slider" id="blurAmount"></center>
+  <input type="range" min="20" max="150" value="75" class="slider" id="blurAmountSlider"></center>
 </div>
 </div>
 
@@ -133,19 +133,8 @@ var rotationCtx = rotationCanvas.getContext("2d");
 var blurredCanvas = document.getElementById("blurredCanvas");
 var blurredCtx = blurredCanvas.getContext("2d");
 
-var brushSize = 50;
-var blurAmount = 50;
-
-//blur amount needs to be set for the size of the canvas ...
-//100 x 100 is arond 5, 2500 x 2500 is around 100
-//i map this later on in the set canvas size
-//however, it is not linear and i need a better solution that letting people fix it themselves w the slider to cover detail
-//the best solution is probably to continue to work on the underlying processes before running the blur
-//so even if the blur is removed the image is still fully unrecognizable
-//the program is there for everything but portraits - a picture of a face fullsize is probably still retrievable
-//idk why anyone would use this tool to anonymize a selfie but the edge case is worth designing for
-//probably the thing is to tie pixelization size to brush size - going to start on that below
-
+// these are placeholders - i map this later on in the set canvas size
+var brushSize = blurAmount = 50;
 
 canvas.addEventListener('mousedown', handleMouseDown);
 canvas.addEventListener('mousemove', handleMouseMove);
@@ -166,10 +155,10 @@ window.addEventListener("drop",function(e){
     e.preventDefault();
 },false);
 
-var brushSizeDiv = document.getElementById("brushSize");
+var brushSizeDiv = document.getElementById("brushSizeSlider");
 brushSizeDiv.onchange = populateBrushSize;
 
-var blurAmountDiv = document.getElementById("blurAmount");
+var blurAmountDiv = document.getElementById("blurAmountSlider");
 blurAmountDiv.onchange = populateBlurAmount;
 
 function populateBrushSize(){
@@ -177,6 +166,8 @@ function populateBrushSize(){
     setCursor();
 }
 
+
+//soon, i'm going to remove this setting and jsut have it tie directly to brush size
 function populateBlurAmount(){
     blurAmount = Math.floor(this.value);
 }
@@ -247,13 +238,11 @@ function onFileChange(e) {
 
             var biggerDimension = Math.max(canvas.width, canvas.height);
 
-            setCursor()
+            // gotta clean this up later - this canvas.diwth value is just adjusting for size but i should make it a variable in case i wanna change it
+            brushSize = (scale(biggerDimension, 10, 2500, 20, 100)) * canvas.width/800;
+            blurAmount = brushSize/2;
+            setCursor();
 
-            // i need to come back to this - blur amount and brush size deviate at big and small images
-
-            brushSize = scale(biggerDimension, 10, 2500, 20, 100); //Math.floor(50 * canvas.width/800);
-            blurAmount = brushSize/2;//scale(biggerDimension, 10, 2500, 1, 75);
-            //console.log(brushSize)
         }
         img.src = event.target.result;
     }
@@ -339,11 +328,13 @@ function handleMouseDown(e) {
     isDown = true;
 }
 
-//bug where it doesn't blur / crashes if you leave the canvas w mouse pressed, fix soon
 function handleMouseOut(e) {
     e.preventDefault();
     e.stopPropagation();
-    isDown = false;
+    
+    if (isDown != false){
+        handleMouseUp(e);
+    }
 }
 
 function handleMouseMove(e) {
@@ -427,17 +418,15 @@ function handleMouseUp(e) {
         if (painting == "undo"){
             blurAmount = 0;
         }
-        //blurredCtx.clearRect(0, 0, canvas.width, canvas.height);
+
         blurredCtx.drawImage(rotationCanvas, 0, 0);
 
-        //tempCtx.save();
-        //tempCtx.globalCompositeOperation = "source-in";
-        //tempCtx.drawImage(rotationCanvas, 0, 0);
-        //tempCtx.restore();
-        //pixelate function is here
+        //pixelate function command is here
         if (painting != "undo"){
         pixelateCanvas(blurredCanvas, blurredCtx);
         }
+        //blur command is here
+        //undo brush is this same command, but run w radius zero
         stackBlurCanvasRGBA("blurredCanvas", 0, 0, blurredCanvas.width, blurredCanvas.height, blurAmount);
         tempCtx.save();
         tempCtx.globalCompositeOperation = 'source-in';
@@ -605,13 +594,6 @@ function pixelateCanvas(inCanvas, inCtx){
 
     var offscreenCtx = offscreenCanvas.getContext('2d');
 
-    // turn off image aliasing for a pixelized look
-    // not currently working BUT the aliasing is confusing to blur reversal tech so ehh maybe i keep it broken?
-    offscreenCtx.msImageSmoothingEnabled = false;
-    offscreenCtx.mozImageSmoothingEnabled = false;
-    offscreenCtx.webkitImageSmoothingEnabled = false;
-    offscreenCtx.imageSmoothingEnabled = false;
-
     offscreenCtx.drawImage(inCanvas, 0, 0, w, h);
     inCtx.save();
 
@@ -630,24 +612,6 @@ function pixelateCanvas(inCanvas, inCtx){
     inCtx.restore();
     //holderCtx.restore();
 
-}
-
-
-//not in atm but could add back in if wanted for even more ~security~
-//just induces some colorful noise in the blur
-function noise(array) {
-    let counter = array.length;
-
-
-    while (counter > 0) {
-        counter--;
-
-        if (array[counter] != 0){
-        array[counter] = Math.floor(randomCryptoNumber() * 255) //array[counter + Math.floor(Math.random() * 20)];
-    }
-    }
-
-    return array;
 }
 
 
