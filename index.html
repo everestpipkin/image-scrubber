@@ -34,21 +34,20 @@
 
 <div id="topBar">
 
-    <div id="drop-zone">
-        <div id="openDiv" class="topBarDiv" class="custom-file-open">
-            <label for="file-input" class="custom-file-open">
+    <div id="drop-zone" class="topBarDiv dropZone">
+            <label for="file-input" class="customFileOpen controlButton">
                 Open image 📂
             </label>
-            <input id="file-input" type="file"/></div>
+            <input id="file-input" type="file"/>
     </div>
 
-<a id="saveButton" onclick="saveImage(this)" class="topBarDiv"><center>Save image 💾</center></a>
+<a id="saveButton" onclick="saveImage(this)" class="topBarDiv controlButton">Save image 💾</a>
 
 
-<div id="rotate" class="topBarDiv"><center>Rotate Image ⤾</center></div>
+<div id="rotate" class="topBarDiv controlButton">Rotate Image ⤾</div>
 
 
-<div id="paintBlur" class="topBarDiv" class="custom-file-open"><center>
+<div id="paintBlur" class="topBarDiv" class="customFileOpen"><center>
 <form id="paintForm">
 <input type="radio" id="Paint" name="paintingAction" value="paint">
 <label for="Paint">Paint</label><br>

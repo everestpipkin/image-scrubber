@@ -13,32 +13,23 @@
 #topBar{
     width:100%;
     border: 1px solid black;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    /* box-sizing: border-box; */
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
 }
 
-
-.topBarDiv{
-    width: 18vw;
-    height: 12vh;
-    border-left: 1px solid #ccc;
-    border-right: 1px solid #ccc;
+.topBarDiv {
+    width: 100%;
+    height: 100%;
+    padding: 5px 0;
+    border-left: 2px solid #ccc;
     display: flex;
     align-items: center;
     justify-content: center;
+    box-sizing: border-box;
+    min-height: 8vh;
 }
-
-
-#file-input{
-    flex-direction: row;
-}
-
-#saveButton{
-    padding-top: 2px;
-    cursor: pointer;
-
+.topBarDiv.dropZone {
+    padding: 0;
 }
 
 #exifInformationHolder{
@@ -80,43 +71,37 @@
     box-sizing: border-box;
 }
 
+#imageScrubberInfo a:hover,
+#imageScrubberInfo a:focus {
+    background: #ff0;
+}
+
 
 @media (max-width: 800px) {
     #imageScrubberInfo {
         max-height: 75%;
     }
+    
+    #topBar {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .topBarDiv{
+        border: none;
+    }
 
+    #imageCanvas{
+        position: absolute;
+        top: 58%;
+        max-height: 75%;
+    }
 
- #topBar {
-    flex-wrap: wrap;
-    height:20vh;
-    align-items: flex-start;
-  }
-
-
-.topBarDiv{
-    width: 33vw;
-    height: 8vh;
-    max-height:10vh;
-    border: 0px solid #ccc;
-    border-left: 0px solid #ccc;
-    border-right: 0px solid #ccc;
-
-}
-
-
-#imageCanvas{
-    position: absolute;
-    top: 58%;
-    max-height: 75%;
-}
-
-#continueButtonExif{
-    position: absolute;
-    bottom: 10%;
-    left: 50%;
-    transform: translateX(-50%) translateY(-50%);
-}
+    #continueButtonExif{
+        position: absolute;
+        bottom: 10%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-50%);
+    }
 }
 
 #exifScrollDiv{
@@ -205,20 +190,15 @@ pre {
 
 }
 
-#rotate{
-        cursor: pointer;
-}
-
-.custom-file-open{
-    cursor: copy;
-    width: 100%;
+.controlButton {
+    cursor: pointer;
     height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding-top: 2px;
+    position: relative;
 }
-.custom-file-open:hover,
-.custom-file-open:focus {
+.controlButton:hover,
+.controlButton:focus {
     background: #ccc;
 }
