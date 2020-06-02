@@ -237,9 +237,9 @@ function onFileChange(e) {
 
             var biggerDimension = Math.max(canvas.width, canvas.height);
 
-            // gotta clean this up later - this canvas.diwth value is just adjusting for size but i should make it a variable in case i wanna change it
-            brushSize = (scale(biggerDimension, 10, 2500, 20, 100)) * canvas.width/800;
-            blurAmount = brushSize/2;
+            // gotta clean this up later - this 800 value is just adjusting for size but i should make it a variable set at the top
+            brushSize = 50 * (biggerDimension/800);
+            blurAmount = (scale(brushSize, 10, 157, 20, 150));
             setCursor();
 
         }
