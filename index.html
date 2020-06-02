@@ -456,7 +456,7 @@ function updateImage(opts = {}){
         }
         //blur command is here
         //undo brush is this same command, but run w radius zero
-        stackBlurCanvasRGBA("blurredCanvas", 0, 0, blurredCanvas.width, blurredCanvas.height, blurAmount);
+        stackBlurCanvasRGBA("blurredCanvas", 0, 0, blurredCanvas.width, blurredCanvas.height, _blurAmount);
         tempCtx.save();
         tempCtx.globalCompositeOperation = 'source-in';
         tempCtx.drawImage(blurredCanvas, 0, 0);
