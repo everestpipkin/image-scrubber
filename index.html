@@ -415,7 +415,7 @@ function handleMouseUp(e) {
         //tempCtx.restore();
         //pixelate function is here
         if (painting != "undo"){
-        pixelateCanvas(blurredCanvas, blurredCtx, 10);
+        pixelateCanvas(blurredCanvas, blurredCtx);
         }
         stackBlurCanvasRGBA("blurredCanvas", 0, 0, blurredCanvas.width, blurredCanvas.height, blurAmount);
         tempCtx.save();
@@ -562,9 +562,9 @@ const scale = (num, in_min, in_max, out_min, out_max) => {
   return (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-function pixelateCanvas(inCanvas, inCtx, blockSize){
+function pixelateCanvas(inCanvas, inCtx){
 
-    // so - smaller canvases need to be bigger block size, because they get too small to render anything
+    // so - smaller canvases also need to scale down less, because they get too small to render anything
     //a 10x10 pixel image should be around .5
     //a 2500x2500 should be around 0.06
     //just gonna use a map function for now- see above
@@ -572,7 +572,7 @@ function pixelateCanvas(inCanvas, inCtx, blockSize){
 
     var biggerDimension = Math.max(inCanvas.width, inCanvas.height);
 
-    var size = scale(biggerDimension, 10, 2500, 0.5, 0.06); 
+    var size = scale(biggerDimension, 10, 2500, 0.1, 0.02); 
     //console.log(size);
     w = inCanvas.width * size;
     h = inCanvas.height * size;
@@ -622,7 +622,7 @@ function noise(array) {
         counter--;
 
         if (array[counter] != 0){
-        array[counter] = Math.floor(Math.random() * 255) //array[counter + Math.floor(Math.random() * 20)];
+        array[counter] = Math.floor(randomCryptoNumber() * 255) //array[counter + Math.floor(Math.random() * 20)];
     }
     }
 
@@ -649,19 +649,34 @@ var holderArray = []
 
         //gets a random element within canvas.width/60 pixels of this one - in the linear pixel array, its kind of silly but it works! always skews images to drift right. might want to come back through and do something nicer but its getting blurred anyway so eh
     
-            var randomElement = x + (Math.floor(Math.random() * (canvas.width/60)));
+            var randomElement = x + (Math.floor(randomCryptoNumber() * (canvas.width/50)));
 
             if (randomElement > holderArray.length || randomElement < 0){
                 randomElement = x;
             }
 
-          array[holderArray[x]] = array[holderArray[randomElement]];
-          array[holderArray[x] + 1] = array[holderArray[randomElement] +1];
-          array[holderArray[x] + 2] = array[holderArray[randomElement] +2];
+//all so some added noise to the pixels when shifted so they should be very hard to next-neighbor stitch back together, even without the aliasing and blur
+
+          array[holderArray[x]] = array[holderArray[randomElement]] + Math.round(randomCryptoNumber()*negativeOrPositive()*3);
+          array[holderArray[x] + 1] = (array[holderArray[randomElement] +1]) + Math.round(randomCryptoNumber()*negativeOrPositive()*3);
+          array[holderArray[x] + 2] = (array[holderArray[randomElement] +2]) + Math.round(randomCryptoNumber()*negativeOrPositive()*3);
           //var alpha = array[i + 3];
 }
     return array;
 }
+
+
+function randomCryptoNumber(){
+  var buf = new Uint8Array(1);
+  window.crypto.getRandomValues(buf);
+  var randomNumber = (buf[0]/255)
+  return randomNumber;
+}
+
+function negativeOrPositive(){
+  return randomCryptoNumber() < 0.5 ? -1 : 1;
+}
+
 
 
 //bits of this code lifted and adapted from various jsfiddles and libraries -- 
