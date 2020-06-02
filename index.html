@@ -183,7 +183,11 @@ function populateBlurAmount(){
 
 function setZoom() {
     zoomScale = this.value / 100;
-    canvas.style.transform = "scale(" + zoomScale + ")";
+    // Zooms in on center, so we have to adjust image positioning
+    // 1/z is the portion visible, so (z-1)/z is the portion hidden
+    // half of that is lost above & left of the div, so translate by (z-1)/2z
+    var zoomTranslate = 100 * (zoomScale-1)/(2*zoomScale); // as a percentage
+    canvas.style.transform = "scale(" + zoomScale + ") translate(" + zoomTranslate + "%, " + zoomTranslate + "%)";
     setCursor();
 }
 
