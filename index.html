@@ -139,7 +139,7 @@ var blurAmount = 50;
 
 // keep the paths the user draws here so we can undo them easily
 // (reset on every new image load)
-var drawnPaths = []
+var pathHistory = []
 
 //blur amount needs to be set for the size of the canvas ...
 //100 x 100 is arond 5, 2500 x 2500 is around 100
@@ -337,7 +337,7 @@ function handleMouseDown(e) {
     
     // if we're not undoing, start a new entry in the path history
     if (painting !== 'undo'){
-        drawnPaths.push({ 
+        pathHistory.push({ 
             painting: painting, 
             brushSize: brushSize, 
             blurAmount: blurAmount,
@@ -376,8 +376,8 @@ function handleMouseMove(e) {
     mouseY = pos.y; 
     
     // add to path history
-    if (drawnPaths.length){
-        drawnPaths[drawnPaths.length - 1].points.push({ x: mouseX, y: mouseY })
+    if (pathHistory.length){
+        pathHistory[pathHistory.length - 1].points.push({ x: mouseX, y: mouseY })
     }
 
     ctx.beginPath();
@@ -716,7 +716,7 @@ var holderArray = []
 }
 
 function undoLastPath(){
-    var lastPath = drawnPaths.pop()
+    var lastPath = pathHistory.pop()
     // nothing in the path history
     if (!lastPath || !lastPath.points){
         console.warn('nothing to undo')
