@@ -735,7 +735,7 @@ function undoLastPath(){
         tempCtx.fill();
     })
     updateImage({ 
-        painting: lastPath.painting !== 'undo' ? 'undo' : 'blur',
+        painting: 'undo',
         brushSize: lastPath.brushSize, 
         blurAmount: lastPath.blurAmount 
     })
