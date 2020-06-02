@@ -34,11 +34,13 @@
 
 <div id="topBar">
 
-    <div id="openDiv" class="topBarDiv" class="custom-file-open"><center>
-    <label for="file-input" class="custom-file-open"><center>
-    Open image 📂</center>
-    </label>
-    <input id="file-input" type="file"/></center></div>
+    <div id="drop-zone">
+        <div id="openDiv" class="topBarDiv" class="custom-file-open"><center>
+            <label for="file-input" class="custom-file-open"><center>
+                Click or drag image 📂</center>
+            </label>
+            <input id="file-input" type="file"/></center></div>
+    </div>
 
 <a id="saveButton" onclick="saveImage(this)" class="topBarDiv"><center>Save image 💾</center></a>
 
@@ -74,9 +76,9 @@
 <pre>
 <center><b>Image Scrubber</b></center>
 
-This is a tool for anonymizing photographs taken at protests. 
+This is a tool for anonymizing photographs taken at protests.
 
-It will remove identifying metadata (<a href="https://en.wikipedia.org/wiki/Exif">Exif data</a>) from photographs, and also allow you to selectively blur parts of the image to cover faces and other identifiable information. 
+It will remove identifying metadata (<a href="https://en.wikipedia.org/wiki/Exif">Exif data</a>) from photographs, and also allow you to selectively blur parts of the image to cover faces and other identifiable information.
 
 Hit the open button to open a photograph. The program will display the data it is removing.
 
@@ -84,7 +86,7 @@ Click okay, and you can then save the scrubbed image by hitting save or right cl
 
 You can select between painting over the image or blurring it out. Dragging on the image will paint on or blur it. You can change your brush size via the slider. The blur function has built-in pixel shuffling/noise and is fairly secure but sensitive information should be covered with the paint tool.
 
-This tool works offline: on a phone you can load the page then turn on airplane mode (or turn off wifi/data) before opening any pictures. On a computer, <a href="https://github.com/everestpipkin/image-scrubber/archive/master.zip">download</a> the zipped code, open the folder, and open index.html in a browser with the internet turned off.  
+This tool works offline: on a phone you can load the page then turn on airplane mode (or turn off wifi/data) before opening any pictures. On a computer, <a href="https://github.com/everestpipkin/image-scrubber/archive/master.zip">download</a> the zipped code, open the folder, and open index.html in a browser with the internet turned off.
 
 <strong>All processing happens directly in the browser- no information is stored or sent anywhere.</strong>
 
@@ -140,7 +142,7 @@ var blurAmount = 50;
 //however, it is not linear and i need a better solution that letting people fix it themselves w the slider to cover detail
 //the best solution is probably to continue to work on the underlying processes before running the blur
 //so even if the blur is removed the image is still fully unrecognizable
-//the program is there for everything but portraits - a picture of a face fullsize is probably still retrievable 
+//the program is there for everything but portraits - a picture of a face fullsize is probably still retrievable
 //idk why anyone would use this tool to anonymize a selfie but the edge case is worth designing for
 //probably the thing is to tie pixelization size to brush size - going to start on that below
 
@@ -155,6 +157,14 @@ canvas.addEventListener('touchmove', handleTouchMove);
 canvas.addEventListener('touchend', handleMouseUp);
 canvas.addEventListener('touchcancel', handleMouseUp);
 
+window.addEventListener("dragover",function(e){
+    e = e || event;
+    e.preventDefault();
+},false);
+window.addEventListener("drop",function(e){
+    e = e || event;
+    e.preventDefault();
+},false);
 
 var brushSizeDiv = document.getElementById("brushSize");
 brushSizeDiv.onchange = populateBrushSize;
@@ -183,7 +193,7 @@ function setCursor(){
     cursorCtx.beginPath();
     cursorCtx.arc(cursorCanvas.width / 2, cursorCanvas.height / 2, (brushSize)*scaleX, 0, Math.PI * 2);
     cursorCtx.closePath();
-    cursorCtx.stroke(); 
+    cursorCtx.stroke();
     var cursorDataURL = cursorCanvas.toDataURL();
     canvas.style.cursor = "url("+cursorDataURL+") " + cursorCanvas.width / 2 +" "+ cursorCanvas.height / 2 + ", auto";
 
@@ -193,7 +203,7 @@ var sz = document.forms['paintForm'].elements['paintingAction'];
 
 // loop through list
 for (var i=0, len=sz.length; i<len; i++) {
-    sz[i].onclick = function() { 
+    sz[i].onclick = function() {
         painting = this.value;
     };
 }
@@ -211,18 +221,24 @@ function saveImage(){
   }, 'image/jpeg', 0.8);
 }
 
-document.getElementById("file-input").onchange = function(e) {
+const dropContainer = document.getElementById('drop-zone')
+const fileInput = document.getElementById('file-input');
 
+dropContainer.ondragover = dropContainer.ondragenter = function(evt) {
+    evt.preventDefault();
+};
+
+function onFileChange(e) {
     var reader = new FileReader();
     reader.onload = function(event){
         img = new Image();
         img.onload = function(){
             if (img.width < 2500 && img.height < 2500){
                 var canvasScale = 1;
-        }
-        else {
-            var canvasScale = Math.min(2500 / img.width, 2500 / img.height)
-        }
+            }
+            else {
+                var canvasScale = Math.min(2500 / img.width, 2500 / img.height)
+            }
 
             canvas.width = tempCanvas.width = holderCanvas.width = rotationCanvas.width = blurredCanvas.width = img.width*canvasScale;
             canvas.height = tempCanvas.height = holderCanvas.height = rotationCanvas.height = blurredCanvas.height = img.height*canvasScale;
@@ -241,44 +257,64 @@ document.getElementById("file-input").onchange = function(e) {
         }
         img.src = event.target.result;
     }
-    reader.readAsDataURL(e.target.files[0]);    
+    reader.readAsDataURL(e.target.files[0]);
 
-            filename = document.getElementById("file-input").value;
-            var exifInformationDiv = document.getElementById("exifInformationHolder");
-            var imageScrubberInfo = document.getElementById("imageScrubberInfo");
-            imageScrubberInfo.style.display = "none";
-            exifInformationDiv.style.display = "block";
-            var file = e.target.files[0]
-            if (file && file.name) {
-                EXIF.getData(file, function() {
+    filename = document.getElementById("file-input").value;
+    var exifInformationDiv = document.getElementById("exifInformationHolder");
+    var imageScrubberInfo = document.getElementById("imageScrubberInfo");
+    imageScrubberInfo.style.display = "none";
+    exifInformationDiv.style.display = "block";
+    var file = e.target.files[0]
+    if (file && file.name) {
+        EXIF.getData(file, function() {
 
-                    var exifData = JSON.stringify(this.exifdata, null, 4);
-                    if (exifData) {
-                        if (exifData.toString() == "{}"){
-                            exifInformationHolder.innerHTML = "<center>No EXIF data found in image '" + file.name + "'.<br><br></center>";
-                        var btn = document.createElement("BUTTON");
-                        btn.id="continueButton";
-                        btn.innerHTML = "Continue to edit image";
-                        btn.onclick = goToBlur;
-                        exifInformationHolder.appendChild(btn)
-                        }
-                        else{
-                        var exifScrollDiv = document.createElement("div");
-                        exifScrollDiv.id = "exifScrollDiv"
-                        exifScrollDiv.innerHTML =  file.name + "<pre>" + exifData + "</pre>";
-                        exifInformationHolder.innerHTML = "Exif Data:<br><br>"
-                        exifInformationHolder.appendChild(exifScrollDiv)
-                        
-                        var btn = document.createElement("BUTTON");
-                        btn.id="continueButtonExif";
-                        btn.innerHTML = "Scrub Exif Data";
-                        btn.onclick = scrubData;
-                        exifInformationHolder.appendChild(btn)
-                    }
-                    }
-                });
+            var exifData = JSON.stringify(this.exifdata, null, 4);
+            if (exifData) {
+                if (exifData.toString() == "{}"){
+                    exifInformationHolder.innerHTML = "<center>No EXIF data found in image '" + file.name + "'.<br><br></center>";
+                    var btn = document.createElement("BUTTON");
+                    btn.id="continueButton";
+                    btn.innerHTML = "Continue to edit image";
+                    btn.onclick = goToBlur;
+                    exifInformationHolder.appendChild(btn)
+                }
+                else{
+                    var exifScrollDiv = document.createElement("div");
+                    exifScrollDiv.id = "exifScrollDiv"
+                    exifScrollDiv.innerHTML =  file.name + "<pre>" + exifData + "</pre>";
+                    exifInformationHolder.innerHTML = "Exif Data:<br><br>"
+                    exifInformationHolder.appendChild(exifScrollDiv)
+
+                    var btn = document.createElement("BUTTON");
+                    btn.id="continueButtonExif";
+                    btn.innerHTML = "Scrub Exif Data";
+                    btn.onclick = scrubData;
+                    exifInformationHolder.appendChild(btn)
+                }
             }
-        }
+        });
+    }
+}
+
+dropContainer.ondrop = function(evt) {
+    // pretty simple -- but not for IE :(
+    fileInput.files = evt.dataTransfer.files;
+
+    // If you want to use some of the dropped files
+    const dT = new DataTransfer();
+    dT.items.add(evt.dataTransfer.files[0]);
+    fileInput.files = dT.files;
+    // Create a new 'change' event
+    const event = new Event('change');
+
+    // Dispatch it.
+    fileInput.dispatchEvent(event);
+    evt.preventDefault();
+};
+
+fileInput.onchange = function(e) {
+    onFileChange(e);
+}
 
 function scrubData(){
     document.getElementById("exifInformationHolder").style.display = "none";
@@ -321,8 +357,8 @@ function handleMouseMove(e) {
     }
     e.preventDefault();
     e.stopPropagation();
-    mouseX = pos.x; 
-    mouseY = pos.y; 
+    mouseX = pos.x;
+    mouseY = pos.y;
 
     ctx.beginPath();
     ctx.arc(mouseX, mouseY, brushSize, 0, Math.PI * 2);
@@ -353,8 +389,8 @@ function handleTouchMove(e) {
         'view': event.target.ownerDocument.defaultView,
         'bubbles': true,
         'cancelable': true,
-        'screenX':touch.screenX,  // get the touch coords 
-        'screenY':touch.screenY,  // and add them to the 
+        'screenX':touch.screenX,  // get the touch coords
+        'screenY':touch.screenY,  // and add them to the
         'clientX':touch.clientX,  // mouse event
         'clientY':touch.clientY,
         });
@@ -370,8 +406,8 @@ function handleTouchMove(e) {
     }
     e.preventDefault();
     e.stopPropagation();
-    mouseX = pos.x; 
-    mouseY = pos.y; 
+    mouseX = pos.x;
+    mouseY = pos.y;
     ctx.beginPath();
     ctx.arc(mouseX, mouseY, brushSize, 0, Math.PI * 2);
     ctx.closePath();
@@ -439,7 +475,7 @@ button.onclick = function () {
 
     }
     else{
-       imageScrubberInfo.style.display = "none"; 
+       imageScrubberInfo.style.display = "none";
     }
 
 }
@@ -452,11 +488,11 @@ button.onclick = function () {
 
 
 
-var myImageData, tempImageData, holderImageData, blurredImageData, rotating = false;   
+var myImageData, tempImageData, holderImageData, blurredImageData, rotating = false;
 
 var rotate = function () {
     if (!rotating) {
-        rotating = true;            
+        rotating = true;
         // store current data to an image
         myImageData = new Image();
         tempImageData = new Image();
@@ -484,7 +520,7 @@ var rotate = function () {
             rotationCanvas.width = ch;
             rotationCanvas.height = cw;
             blurredCanvas.width = ch;
-            blurredCanvas.height = cw;           
+            blurredCanvas.height = cw;
             cw = canvas.width;
             ch = canvas.height;
 
@@ -493,7 +529,7 @@ var rotate = function () {
             ctx.translate(cw, ch / cw);
             ctx.rotate(Math.PI / 2);
             // draw the previows image, now rotated
-            ctx.drawImage(myImageData, 0, 0);               
+            ctx.drawImage(myImageData, 0, 0);
             ctx.restore();
 
             tempCtx.save();
@@ -501,7 +537,7 @@ var rotate = function () {
             tempCtx.translate(cw, ch / cw);
             tempCtx.rotate(Math.PI / 2);
             // draw the previows image, now rotated
-            tempCtx.drawImage(tempImageData, 0, 0);               
+            tempCtx.drawImage(tempImageData, 0, 0);
             tempCtx.restore();
 
 
@@ -510,7 +546,7 @@ var rotate = function () {
             rotationCtx.translate(cw, ch / cw);
             rotationCtx.rotate(Math.PI / 2);
             // draw the previows image, now rotated
-            rotationCtx.drawImage(rotationImageData, 0, 0);               
+            rotationCtx.drawImage(rotationImageData, 0, 0);
             rotationCtx.restore();
 
             blurredCtx.save();
@@ -518,16 +554,16 @@ var rotate = function () {
             blurredCtx.translate(cw, ch / cw);
             blurredCtx.rotate(Math.PI / 2);
             // draw the previows image, now rotated
-            blurredCtx.drawImage(rotationImageData, 0, 0);               
+            blurredCtx.drawImage(rotationImageData, 0, 0);
             blurredCtx.restore();
 
-            //don't need to rotate the holder as it gets cleared anyway. 
+            //don't need to rotate the holder as it gets cleared anyway.
             //holderCtx.save();
             // translate and rotate
             //holderCtx.translate(cw, ch / cw);
             //holderCtx.rotate(Math.PI / 2);
             // draw the previows image, now rotated
-            //holderCtx.drawImage(holderImageData, 0, 0);               
+            //holderCtx.drawImage(holderImageData, 0, 0);
             //holderCtx.restore();
 
             // clear the temporary image
@@ -536,7 +572,7 @@ var rotate = function () {
             blurredImageData = null;
 
             //holderImageData = null;
-            rotating = false;               
+            rotating = false;
         }
     }
 }
@@ -557,7 +593,7 @@ function pixelateCanvas(inCanvas, inCtx){
 
     var biggerDimension = Math.max(inCanvas.width, inCanvas.height);
 
-    var size = scale(biggerDimension, 10, 2500, 0.1, 0.02); 
+    var size = scale(biggerDimension, 10, 2500, 0.1, 0.02);
     //console.log(size);
     w = inCanvas.width * size;
     h = inCanvas.height * size;
@@ -579,7 +615,7 @@ function pixelateCanvas(inCanvas, inCtx){
     offscreenCtx.drawImage(inCanvas, 0, 0, w, h);
     inCtx.save();
 
-    // enlarge the minimized image to full size and draw to main canvas  
+    // enlarge the minimized image to full size and draw to main canvas
     inCtx.drawImage(offscreenCanvas, 0, 0, w, h, 0, 0, inCanvas.width, inCanvas.height);
 
     pixelArray = offscreenCtx.getImageData(0, 0, w, h);
@@ -588,7 +624,7 @@ function pixelateCanvas(inCanvas, inCtx){
 
     offscreenCtx.putImageData(pixelArray, 0,0);
 
-    // enlarge the minimized image to full size and draw to main canvas  
+    // enlarge the minimized image to full size and draw to main canvas
     inCtx.drawImage(offscreenCanvas, 0, 0, w, h, 0, 0, inCanvas.width, inCanvas.height);
 
     inCtx.restore();
@@ -633,7 +669,7 @@ var holderArray = []
     for(x = 0; x < holderArray.length; x++) {
 
         //gets a random element within canvas.width/60 pixels of this one - in the linear pixel array, its kind of silly but it works! always skews images to drift right. might want to come back through and do something nicer but its getting blurred anyway so eh
-    
+
             var randomElement = x + (Math.floor(randomCryptoNumber() * (canvas.width/50)));
 
             if (randomElement > holderArray.length || randomElement < 0){
@@ -664,7 +700,7 @@ function negativeOrPositive(){
 
 
 
-//bits of this code lifted and adapted from various jsfiddles and libraries -- 
+//bits of this code lifted and adapted from various jsfiddles and libraries --
 //thank you:
 //http://jsfiddle.net/sierawski/4xezb7nL/
 //https://stackoverflow.com/questions/22604903/needed-canvas-blurring-tool
@@ -679,7 +715,7 @@ function negativeOrPositive(){
 
 
 
-/// // // / 
+/// // // /
 
     </script>
 </body>
