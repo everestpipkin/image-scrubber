@@ -13,7 +13,7 @@
 	// register service worker
 
 	if ('serviceWorker' in navigator) {
-		navigator.serviceWorker.register('scripts/sw.js', { scope: '/image-scrubber/' }).then(function(reg) {
+		navigator.serviceWorker.register('sw.js', { scope: '/image-scrubber/' }).then(function(reg) {
 
 			if(reg.installing) {
 				console.log('Service worker installing');
