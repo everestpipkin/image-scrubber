@@ -24,9 +24,7 @@ If you're a command-line whiz with git set up, you can clone this repository ins
 
     git clone https://github.com/everestpipkin/image-scrubber
 
-
-~~~
-
+---
 
 Bits of code all though this lifted and adapted from various jsfiddles and libraries --
 

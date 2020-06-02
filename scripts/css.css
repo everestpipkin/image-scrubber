@@ -216,7 +216,7 @@ pre {
 }
 
 .custom-file-open{
-    cursor: pointer;
+    cursor: copy;
 }
 
 .undo-button {
