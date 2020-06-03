@@ -1,5 +1,6 @@
 const filesToCache = [
 	'/image-scrubber/',
+	'/image-scrubber/scripts/js.js',
 	'/image-scrubber/scripts/exif.js',
 	'/image-scrubber/scripts/stackblur.js',
 	'/image-scrubber/scripts/css.css',
