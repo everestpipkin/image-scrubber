@@ -1,75 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="manifest" href="scripts/manifest.json">
-    <link rel="apple-touch-icon" href="scrubber_logo_ios_homescreen.png">
-    <title>Image Scrubber</title>
-</head>
-<link rel="stylesheet" type="text/css" href="scripts/css.css">
-<script>
-	// register service worker
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <link rel="manifest" href="scripts/manifest.json" />
+        <link rel="apple-touch-icon" href="scrubber_logo_ios_homescreen.png" />
+        <title>Image Scrubber</title>
+    </head>
+    <link rel="stylesheet" type="text/css" href="scripts/css.css" />
+    <script>
+        // register service worker
 
-	if ('serviceWorker' in navigator) {
-		navigator.serviceWorker.register('sw.js', { scope: '/image-scrubber/' }).then(function(reg) {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker
+                .register('sw.js', { scope: '/image-scrubber/' })
+                .then(function (reg) {
+                    if (reg.installing) {
+                        console.log('Service worker installing');
+                    } else if (reg.waiting) {
+                        console.log('Service worker installed');
+                    } else if (reg.active) {
+                        console.log('Service worker active');
+                    }
+                })
+                .catch(function (error) {
+                    // registration failed
+                    console.log('Registration failed with ' + error);
+                });
+        }
+    </script>
+    <body>
+        <div id="topBar">
+            <div id="drop-zone" class="topBarDiv dropZone">
+                <label for="file-input" class="customFileOpen controlButton"
+                    >Open&nbsp;Image&nbsp;📂</label
+                >
+                <input id="file-input" type="file" />
+            </div>
 
-			if(reg.installing) {
-				console.log('Service worker installing');
-			} else if(reg.waiting) {
-				console.log('Service worker installed');
-			} else if(reg.active) {
-				console.log('Service worker active');
-			}
+            <a
+                id="saveButton"
+                onclick="saveImage(this)"
+                class="topBarDiv controlButton"
+                >Save&nbsp;Image&nbsp;💾</a
+            >
 
-		}).catch(function(error) {
-			// registration failed
-			console.log('Registration failed with ' + error);
-		});
-	}
+            <div id="rotate" class="topBarDiv controlButton">
+                Rotate&nbsp;Image&nbsp;⤾
+            </div>
 
-</script>
-<body>
+            <div id="paintBlur" class="topBarDiv" class="customFileOpen">
+                <form id="paintForm">
+                    <input
+                        type="radio"
+                        id="Paint"
+                        name="paintingAction"
+                        value="paint"
+                    />
+                    <label for="Paint">Paint</label><br />
+                    <input
+                        type="radio"
+                        id="Blur"
+                        name="paintingAction"
+                        value="blur"
+                        checked
+                    />
+                    <label for="Blur">Blur&nbsp;</label><br />
+                    <input
+                        type="radio"
+                        id="Undo"
+                        name="paintingAction"
+                        value="undo"
+                    />
+                    <label for="Undo">Undo&nbsp;</label>
+                </form>
+            </div>
 
-<div id="topBar">
+            <div id="brushSizeDiv" class="topBarDiv">
+                <center>
+                    Brush&nbsp;Size<br />
+                    <input
+                        type="range"
+                        min="10"
+                        max="100"
+                        value="55"
+                        class="slider"
+                        id="brushSizeSlider"
+                    />
+                </center>
+            </div>
 
-    <div id="drop-zone" class="topBarDiv dropZone">
-            <label for="file-input" class="customFileOpen controlButton">Open&nbsp;Image&nbsp;📂</label>
-            <input id="file-input" type="file"/>
-    </div>
+            <div id="blurAmountDiv" class="topBarDiv">
+                <center>
+                    Blur&nbsp;Radius<br />
+                    <input
+                        type="range"
+                        min="40"
+                        max="150"
+                        value="75"
+                        class="slider"
+                        id="blurAmountSlider"
+                    />
+                </center>
+            </div>
+        </div>
 
-    <a id="saveButton" onclick="saveImage(this)" class="topBarDiv controlButton">Save&nbsp;Image&nbsp;💾</a>
+        <button id="about">About</button>
 
-    <div id="rotate" class="topBarDiv controlButton">Rotate&nbsp;Image&nbsp;⤾</div>
-
-
-    <div id="paintBlur" class="topBarDiv" class="customFileOpen"><center>
-
-    <form id="paintForm">
-    <input type="radio" id="Paint" name="paintingAction" value="paint">
-    <label for="Paint">Paint</label><br>
-    <input type="radio" id="Blur" name="paintingAction" value="blur" checked>
-    <label for="Blur">Blur&nbsp;</label><br>
-    <input type="radio" id="Undo" name="paintingAction" value="undo">
-    <label for="Undo">Undo&nbsp;</label>
-    </form>
-    </div>
-
-
-    <div id="brushSizeDiv" class="topBarDiv"><center>Brush&nbsp;Size<br>
-      <input type="range" min="10" max="100" value="55" class="slider" id="brushSizeSlider"></center>
-    </div>
-
-    <div id="blurAmountDiv" class="topBarDiv"><center>Blur&nbsp;Radius<br>
-      <input type="range" min="40" max="150" value="75" class="slider" id="blurAmountSlider"></center>
-    </div>
-</div>
-
-<button id="about">About</button>
-
-<div id="imageScrubberInfo">
-    <pre>
+        <div id="imageScrubberInfo">
+            <pre>
     <center><b>Image Scrubber</b></center>
 
     This is a tool for anonymizing photographs taken at protests.
@@ -93,19 +133,17 @@
 
     If you want other ways to cover your digital footprint, I've assembled a list of resources: via <a href="https://docs.google.com/document/d/1615pZB11BhsR0KtvyiXfzfMUBlxZi47HzzhWHIRpxwU/edit" target="_blank">Google Doc</a> or <a href="https://pastebin.com/TPgtvmVB" target="_blank">Pastebin</a>.
     </pre>
+        </div>
 
-</div>
+        <div id="exifInformationHolder"></div>
+        <canvas id="imageCanvas"></canvas>
+        <canvas id="tempCanvas"></canvas>
+        <canvas id="holderCanvas"></canvas>
+        <canvas id="rotationCanvas"></canvas>
+        <canvas id="blurredCanvas"></canvas>
 
-    <div id="exifInformationHolder"></div>
-    <canvas id="imageCanvas"></canvas>
-    <canvas id="tempCanvas"></canvas>
-    <canvas id="holderCanvas"></canvas>
-    <canvas id="rotationCanvas"></canvas>
-    <canvas id="blurredCanvas"></canvas>
-
-    <script type="text/javascript" src="scripts/exif.js"></script>
-    <script type="text/javascript" src="scripts/stackblur.js"></script>
-    <script type="text/javascript" src="scripts/js.js"></script>
-
-</body>
+        <script type="text/javascript" src="scripts/exif.js"></script>
+        <script type="text/javascript" src="scripts/stackblur.js"></script>
+        <script type="text/javascript" src="scripts/js.js"></script>
+    </body>
 </html>

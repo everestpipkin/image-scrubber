@@ -1,5 +1,4 @@
-
-#imageCanvas{
+#imageCanvas {
     position: absolute;
     top: 56%;
     left: 50%;
@@ -10,8 +9,8 @@
     cursor: crosshair;
 }
 
-#topBar{
-    width:100%;
+#topBar {
+    width: 100%;
     border: 1px solid black;
     display: grid;
     grid-template-columns: repeat(6, 1fr);
@@ -32,7 +31,7 @@
     padding: 0;
 }
 
-#exifInformationHolder{
+#exifInformationHolder {
     padding: 10px;
     border: 1px solid black;
     position: absolute;
@@ -53,7 +52,7 @@
     max-height: 88%;
 }
 
-#imageScrubberInfo{
+#imageScrubberInfo {
     position: absolute;
     left: 0;
     right: 0;
@@ -76,27 +75,26 @@
     background: #ff0;
 }
 
-
 @media (max-width: 800px) {
     #imageScrubberInfo {
         max-height: 75%;
     }
-    
+
     #topBar {
         grid-template-columns: repeat(3, 1fr);
     }
-    
-    .topBarDiv{
+
+    .topBarDiv {
         border: none;
     }
 
-    #imageCanvas{
+    #imageCanvas {
         position: absolute;
         top: 58%;
         max-height: 75%;
     }
 
-    #continueButtonExif{
+    #continueButtonExif {
         position: absolute;
         bottom: 10%;
         left: 50%;
@@ -104,47 +102,45 @@
     }
 }
 
-#exifScrollDiv{
+#exifScrollDiv {
     position: inline-block;
     height: 75vh;
     max-height: 75vh;
     overflow-y: auto;
-
 }
 
 #tempCanvas {
-    position:absolute;
-    top:-1000px;
+    position: absolute;
+    top: -1000px;
     display: none;
 }
 
 #holderCanvas {
-    position:absolute;
-    top:-1000px;
+    position: absolute;
+    top: -1000px;
     display: none;
 }
 
 #rotationCanvas {
-    position:absolute;
-    top:-1000px;
+    position: absolute;
+    top: -1000px;
     display: none;
 }
 
 #blurredCanvas {
-    position:absolute;
-    top:-1000px;
+    position: absolute;
+    top: -1000px;
     display: none;
 }
 
-#about{
-  position:absolute;
-  bottom: 10px;
-  right: 10px;
-  z-index: 20;
-
+#about {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    z-index: 20;
 }
 
-body{
+body {
     font-family: Courier;
     margin: 0;
     padding: 0;
@@ -152,20 +148,20 @@ body{
     overflow: hidden;
 }
 
-button{
-font-family: Courier;
+button {
+    font-family: Courier;
     font-size: 12px;
 }
 
-#continueButton, #continueButtonExif{
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 40%;
+#continueButton,
+#continueButtonExif {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 40%;
 }
 
-
-input[type="file"] {
+input[type='file'] {
     display: none;
 }
 
@@ -178,16 +174,15 @@ input[type="file"] {
 
 /* The slider itself */
 .slider {
-  width: 95%; /* Full-width */
+    width: 95%; /* Full-width */
 }
 
 pre {
- white-space: pre-wrap;       /* css-3 */
- white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
- white-space: -pre-wrap;      /* Opera 4-6 */
- white-space: -o-pre-wrap;    /* Opera 7 */
- word-wrap: break-word;       /* Internet Explorer 5.5+ */
-
+    white-space: pre-wrap; /* css-3 */
+    white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
+    white-space: -pre-wrap; /* Opera 4-6 */
+    white-space: -o-pre-wrap; /* Opera 7 */
+    word-wrap: break-word; /* Internet Explorer 5.5+ */
 }
 
 .controlButton {
