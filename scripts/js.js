@@ -19,6 +19,9 @@ var rotationCtx = rotationCanvas.getContext('2d');
 var blurredCanvas = document.getElementById('blurredCanvas');
 var blurredCtx = blurredCanvas.getContext('2d');
 
+var offscreenCanvas = document.getElementById('offscreenCanvas');
+var offscreenCtx = offscreenCanvas.getContext('2d');
+
 // these are placeholders - i map this later on in the set canvas size
 var brushSize = (blurAmount = 50);
 var brushAdjustment = 800;
@@ -320,7 +323,7 @@ function handleMouseUp(e) {
 
         //pixelate function command is here
         if (painting != 'undo') {
-            oldPixelateCanvas(blurredCanvas, blurredCtx);
+            pixelateCanvas(blurredCanvas, blurredCtx);
         }
         //blur command is here - undo brush is this same command, but run w radius zero
         stackBlurCanvasRGBA(
@@ -493,7 +496,7 @@ function pixelateCanvas(inCanvas, inCtx) {
     );
 
     pixelArray = offscreenCtx.getImageData(0, 0, w, h);
-    pixelArray.data = oldShuffle(pixelArray.data);
+    pixelArray.data = shuffle(pixelArray.data);
 
     offscreenCtx.putImageData(pixelArray, 0, 0);
 
@@ -589,12 +592,9 @@ function oldPixelateCanvas(inCanvas, inCtx){
     w = inCanvas.width * size;
     h = inCanvas.height * size;
 
-    // create offscreen image
-    var offscreenCanvas = document.createElement('canvas');
     offscreenCanvas.width = w;
     offscreenCanvas.height = h;
 
-    var offscreenCtx = offscreenCanvas.getContext('2d');
 
     offscreenCtx.drawImage(inCanvas, 0, 0, w, h);
     inCtx.save();
