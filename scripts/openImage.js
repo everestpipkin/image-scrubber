@@ -48,6 +48,9 @@ window.addEventListener(
     },
     false
 );
+window.addEventListener('mouseout', function (e) {
+    document.body.classList.remove('dragging');
+});
 
 function onFileChange(e) {
     var reader = new FileReader();
