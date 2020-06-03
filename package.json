@@ -7,15 +7,15 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/SaFrMo/image-scrubber.git"
+        "url": "git+https://github.com/everestpipkin/image-scrubber.git"
     },
     "keywords": [],
     "author": "",
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/SaFrMo/image-scrubber/issues"
+        "url": "https://github.com/everestpipkin/image-scrubber/issues"
     },
-    "homepage": "https://github.com/SaFrMo/image-scrubber#readme",
+    "homepage": "https://github.com/everestpipkin/image-scrubber#readme",
     "devDependencies": {
         "prettier": "2.0.5"
     },
