@@ -24,6 +24,10 @@ body:not(.dragging) #drop-zone {
     pointer-events: none;
     opacity: 0;
 }
+#drop-zone .icon {
+    width: 100%;
+    height: 100%;
+}
 
 #topBar {
     width: 100%;
