@@ -472,12 +472,8 @@ function pixelateCanvas(inCanvas, inCtx) {
     w = inCanvas.width * size;
     h = inCanvas.height * size;
 
-    // create offscreen image
-    var offscreenCanvas = document.createElement('canvas');
     offscreenCanvas.width = w;
     offscreenCanvas.height = h;
-
-    var offscreenCtx = offscreenCanvas.getContext('2d');
 
     offscreenCtx.drawImage(inCanvas, 0, 0, w, h);
     inCtx.save();
@@ -574,83 +570,6 @@ function negativeOrPositive() {
 }
 
 
-
-
-
-function oldPixelateCanvas(inCanvas, inCtx){
-
-    // so - smaller canvases also need to scale down less, because they get too small to render anything
-    //a 10x10 pixel image should be around .5
-    //a 2500x2500 should be around 0.06
-    //just gonna use a map function for now- see above
-    //this could use some attention later
-
-    var biggerDimension = Math.max(inCanvas.width, inCanvas.height);
-
-    var size = scale(biggerDimension, 10, 2500, 0.1, 0.02);
-    //console.log(size);
-    w = inCanvas.width * size;
-    h = inCanvas.height * size;
-
-    offscreenCanvas.width = w;
-    offscreenCanvas.height = h;
-
-
-    offscreenCtx.drawImage(inCanvas, 0, 0, w, h);
-    inCtx.save();
-
-    // enlarge the minimized image to full size and draw to main canvas
-    inCtx.drawImage(offscreenCanvas, 0, 0, w, h, 0, 0, inCanvas.width, inCanvas.height);
-
-    pixelArray = offscreenCtx.getImageData(0, 0, w, h);
-    pixelArray.data = shuffle(pixelArray.data)
-    //pixelArray.data = noise(pixelArray.data) // this induces colorful noise but its unneeded i think
-
-    offscreenCtx.putImageData(pixelArray, 0,0);
-
-    // enlarge the minimized image to full size and draw to main canvas
-    inCtx.drawImage(offscreenCanvas, 0, 0, w, h, 0, 0, inCanvas.width, inCanvas.height);
-
-    inCtx.restore();
-    //holderCtx.restore();
-
-}
-
-
-function oldShuffle(array) {
-
-var holderArray = []
-
-    for(var i = 0, n = array.length; i < n; i += 4) {
-          var red = array[i];
-          var green = array[i + 1];
-          var blue = array[i + 2];
-          //var alpha = array[i + 3];
-
-          if (red+green+blue != 0){
-            holderArray.push(i);
-          }
-    }
-
-    for(x = 0; x < holderArray.length; x++) {
-
-        //gets a random element within canvas.width/60 pixels of this one - in the linear pixel array, its kind of silly but it works! always skews images to drift right. might want to come back through and do something nicer but its getting blurred anyway so eh
-
-            var randomElement = x + (Math.floor(randomCryptoNumber() * (canvas.width/50)));
-
-            if (randomElement > holderArray.length || randomElement < 0){
-                randomElement = x;
-            }
-
-//all so some added noise to the pixels when shifted so they should be very hard to next-neighbor stitch back together, even without the aliasing and blur
-
-          array[holderArray[x]] = array[holderArray[randomElement]] + Math.round(randomCryptoNumber()*negativeOrPositive()*3);
-          array[holderArray[x] + 1] = (array[holderArray[randomElement] +1]) + Math.round(randomCryptoNumber()*negativeOrPositive()*3);
-          array[holderArray[x] + 2] = (array[holderArray[randomElement] +2]) + Math.round(randomCryptoNumber()*negativeOrPositive()*3);
-          //var alpha = array[i + 3];
-}
-    return array;
-}
 
 
 
