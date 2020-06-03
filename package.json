@@ -2,9 +2,8 @@
     "name": "image-scrubber",
     "version": "1.0.0",
     "description": "This is a tool for anonymizing photographs taken at protests.",
-    "main": "sw.js",
     "scripts": {
-        "cleanup": "prettier --write **/*"
+        "cleanup": "prettier --write **/*.{js,css,html}"
     },
     "repository": {
         "type": "git",
@@ -19,5 +18,10 @@
     "homepage": "https://github.com/SaFrMo/image-scrubber#readme",
     "devDependencies": {
         "prettier": "2.0.5"
+    },
+    "prettier": {
+        "tabWidth": 4,
+        "semi": true,
+        "singleQuote": true
     }
 }
