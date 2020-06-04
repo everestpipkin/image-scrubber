@@ -9,6 +9,26 @@
     cursor: crosshair;
 }
 
+#drop-zone {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    bottom: 20px;
+    left: 20px;
+    border-radius: 20px;
+    background: rgba(204, 204, 204, 0.9);
+    z-index: 10;
+    transition: opacity 0.2s;
+}
+body:not(.dragging) #drop-zone {
+    pointer-events: none;
+    opacity: 0;
+}
+#drop-zone .icon {
+    width: 100%;
+    height: 100%;
+}
+
 #topBar {
     width: 100%;
     border: 1px solid black;
@@ -26,9 +46,10 @@
     justify-content: center;
     box-sizing: border-box;
     min-height: 8vh;
-}
-.topBarDiv.dropZone {
     padding: 0;
+}
+#paintForm {
+    margin: 10px 0;
 }
 
 #exifInformationHolder {
