@@ -43,3 +43,35 @@ Thank you:
 * And to everyone who has contributed to this repository or filed a bug report.
 
 My code is still a bit of a mess but utility over cleanliness, will continue to fix up in the coming days after the more critical work is over.
+
+## Tech notes
+
+There are 6 canvases on the page:
+
+* `imageCanvas` is the only visible canvas. It's where the composite image is rendered and is downloaded when the user is done.
+* `tempCanvas`
+* `holderCanvas`
+* `rotationCanvas`
+* `blurredCanvas`
+* `offscreenCanvas`, which is used to render the custom cursor
+
+### Opening an image
+
+When you open an image:
+
+1. All canvases are resized to match the image's dimensions, scaled so that no side is 2500px or more.
+1. The image is drawn on `imageCanvas` and `rotationCanvas`.
+1. The brush size and blur radius adjust themselves to the size of the image - the larger the image, the larger the brush and blur.
+1. The cursor is rendered offscreen and saved to a data URL in CSS.
+
+### Drawing a path
+
+When you click or tap on the canvas:
+
+1. **On mouse down/tap start:**
+    1. The current `imageCanvas` image is copied to the `holderCanvas`.
+    1. The `tempCanvas` is cleared. 
+    1. The mouse/touch position is saved as `lastPos`.
+1. **On mouse/tap move:**
+    1. `TODO: drawMousePath function`
+    1. The mouse/touch position is saved as `lastPos`.
