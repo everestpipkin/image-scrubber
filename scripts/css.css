@@ -46,9 +46,10 @@ body:not(.dragging) #drop-zone {
     justify-content: center;
     box-sizing: border-box;
     min-height: 8vh;
-}
-.topBarDiv.dropZone {
     padding: 0;
+}
+#paintForm {
+    margin: 10px 0;
 }
 
 #exifInformationHolder {
