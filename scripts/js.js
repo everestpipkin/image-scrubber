@@ -479,14 +479,9 @@ function pixelateCanvas(inCanvas, inCtx) {
     offscreenCanvas.width = inCanvas.width; //w;
     offscreenCanvas.height = inCanvas.height; //h;
 
-    //offscreenCtx.clearRect(0,0,offscreenCanvas.width, offscreenCanvas.height)
-
     offscreenCtx.drawImage(inCanvas, 0, 0, w, h);
     offscreenCtx.scale(w*size,h*size);
     
-
-    console.log(offscreenCanvas.width, offscreenCanvas.height);
-
     inCtx.save();
 
     // turn off image aliasing for a pixely look - currently off
