@@ -325,7 +325,9 @@ function handleMouseUp(e) {
         if (painting != 'undo') {
             pixelateCanvas(blurredCanvas, blurredCtx);
         }
+
         //blur command is here - undo brush is this same command, but run w radius zero
+        
         stackBlurCanvasRGBA(
             'blurredCanvas',
             0,
@@ -472,11 +474,24 @@ function pixelateCanvas(inCanvas, inCtx) {
     w = inCanvas.width * size;
     h = inCanvas.height * size;
 
-    offscreenCanvas.width = w;
-    offscreenCanvas.height = h;
+    offscreenCanvas.width = inCanvas.width; //w;
+    offscreenCanvas.height = inCanvas.height; //h;
+
+    //offscreenCtx.clearRect(0,0,offscreenCanvas.width, offscreenCanvas.height)
 
     offscreenCtx.drawImage(inCanvas, 0, 0, w, h);
+    offscreenCtx.scale(w*size,h*size);
+    
+
+    console.log(offscreenCanvas.width, offscreenCanvas.height);
+
     inCtx.save();
+
+    // turn off image aliasing for a pixely look - currently off
+    //inCtx.msImageSmoothingEnabled = false;
+    //inCtx.mozImageSmoothingEnabled = false;
+    //inCtx.webkitImageSmoothingEnabled = false;
+    //inCtx.imageSmoothingEnabled = false;
 
     // enlarge the minimized image to full size and draw to main canvas
     inCtx.drawImage(
@@ -496,7 +511,6 @@ function pixelateCanvas(inCanvas, inCtx) {
 
     offscreenCtx.putImageData(pixelArray, 0, 0);
 
-    // enlarge the minimized image to full size and draw to main canvas
     inCtx.drawImage(
         offscreenCanvas,
         0,
@@ -509,12 +523,14 @@ function pixelateCanvas(inCanvas, inCtx) {
         inCanvas.height
     );
 
+
     inCtx.restore();
 }
 
 function shuffle(array) {
     //this should maybe just be running on the blur path not the whole canvas - however i'd need to refactor the way the data is passed around in general so for now it runs on the whole canvas
 
+    var biggerDimension = Math.max(canvas.width, canvas.height);
     var holderArray = [];
 
     for (var i = 0, n = array.length; i < n; i += 4) {
@@ -529,13 +545,13 @@ function shuffle(array) {
     }
 
     for (x = 0; x < holderArray.length; x++) {
-        //gets a random element within canvas.width/60 pixels of this one - in the linear pixel array, its kind of silly but it works! always skews horizontal. might want to come back through and do something nicer but its getting blurred anyway so eh
+        //gets a random element within biggerDimension/100 pixels of this one - in the linear pixel array, its kind of silly but it works! always skews horizontal. might want to come back through and do something nicer but its getting blurred anyway so eh
 
         var randomElement =
             x +
             Math.floor(
                 randomCryptoNumber() *
-                    (canvas.width / 60) *
+                    (biggerDimension / 100) *
                     negativeOrPositive()
             );
 
@@ -557,6 +573,7 @@ function shuffle(array) {
     }
     return array;
 }
+
 
 function randomCryptoNumber() {
     var buf = new Uint8Array(1);
