@@ -3,6 +3,7 @@ var img;
 
 var isDown = false;
 var painting = false;
+var lastPos;
 
 var canvas = document.getElementById('imageCanvas');
 var ctx = canvas.getContext('2d');
@@ -249,6 +250,7 @@ function handleMouseDown(e) {
 
     tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
     isDown = true;
+    lastPos = getMousePos(canvas, e);
 }
 
 function handleMouseOut(e) {
@@ -271,6 +273,7 @@ function handleMouseMove(e) {
     e.preventDefault();
     e.stopPropagation();
     drawMousePath(pos.x, pos.y);
+    lastPos = pos;
 }
 
 function handleTouchMove(e) {
@@ -295,24 +298,13 @@ function handleTouchMove(e) {
     );
     // send it to the same target as the touch event contact point.
     touch.target.dispatchEvent(mouseEvent);
-
-    var pos = getMousePos(canvas, e);
-    posx = pos.x;
-    posy = pos.y;
-
-    if (!isDown) {
-        return;
-    }
-    e.preventDefault();
-    e.stopPropagation();
-
-    drawMousePath(pos.x, pos.y);
 }
 
 function handleMouseUp(e) {
     e.preventDefault();
     e.stopPropagation();
     isDown = false;
+    lastPos = null;
     if (painting != 'paint') {
         var tempBlurAmount = blurAmount;
         if (painting == 'undo') {
@@ -352,14 +344,24 @@ function handleMouseUp(e) {
 }
 
 function drawMousePath(mouseX, mouseY) {
-    ctx.beginPath();
-    ctx.arc(mouseX, mouseY, brushSize, 0, Math.PI * 2);
-    ctx.closePath();
-    ctx.fill();
-    tempCtx.beginPath();
-    tempCtx.arc(mouseX, mouseY, brushSize, 0, Math.PI * 2);
-    tempCtx.closePath();
-    tempCtx.fill();
+    interpolatePath(ctx, lastPos.x, lastPos.y, mouseX, mouseY, brushSize);
+    interpolatePath(tempCtx, lastPos.x, lastPos.y, mouseX, mouseY, brushSize);
+}
+
+function interpolatePath(pathCtx, x1, y1, x2, y2, r) {
+    // Draw rectangle from last point
+    pathCtx.beginPath();
+    pathCtx.moveTo(x1,y1);
+    pathCtx.lineTo(x2,y2);
+    pathCtx.closePath();
+    pathCtx.lineWidth = 2 * r;
+    pathCtx.stroke();
+
+    // Draw the circle at the end
+    pathCtx.beginPath();
+    pathCtx.arc(x2, y2, r, 0, Math.PI * 2);
+    pathCtx.closePath();
+    pathCtx.fill();
 }
 
 function getMousePos(canvas, evt) {
