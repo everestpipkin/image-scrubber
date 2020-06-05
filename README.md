@@ -49,11 +49,11 @@ My code is still a bit of a mess but utility over cleanliness, will continue to 
 There are 6 canvases on the page:
 
 * `imageCanvas` is the only visible canvas. It's where the composite image is rendered and is downloaded when the user is done.
-* `tempCanvas`
+* `tempCanvas` holds path data when drawing paths.
 * `holderCanvas`
 * `rotationCanvas`
 * `blurredCanvas`
-* `offscreenCanvas`, which is used to render the custom cursor
+* `offscreenCanvas`, which is used to render the custom cursor.
 
 ### Opening an image
 
@@ -73,5 +73,12 @@ When you click or tap on the canvas:
     1. The `tempCanvas` is cleared. 
     1. The mouse/touch position is saved as `lastPos`.
 1. **On mouse/tap move:**
-    1. `TODO: drawMousePath function`
+    1. A circle is drawn at each point to the `imageCanvas` and `tempCanvas`.
     1. The mouse/touch position is saved as `lastPos`.
+1. **On mouse/tap end (or the cursor leaving the canvas):**
+    1. *If the user is painting a solid color:*
+        * No extra action is taken, since the solid colors were drawn onto the `imagCanvas` during the mouse/tap move step.
+    1. *If the user is painting a blur:*
+        * The image from the `rotationCanvas` is copied to the `blurredCanvas`.
+        * The image from the `blurredCanvas` is copied to the `offscreenCanvas`.
+        * TODO: continue
