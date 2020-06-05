@@ -3,6 +3,9 @@ var img;
 
 var isDown = false;
 var painting = false;
+var brush = false;
+var mouseX_start;
+var mouseY_start;
 var lastPos;
 
 var canvas = document.getElementById('imageCanvas');
@@ -90,6 +93,15 @@ for (var i = 0, len = sz.length; i < len; i++) {
     };
 }
 
+// same as above, but for 'useBrush' options
+var bl = document.forms['brushForm'].elements['useBrush'];
+
+for (var i = 0, len = bl.length; i < len; i++) {
+    bl[i].onclick = function () {
+        brush = this.value;
+    };
+}
+
 function saveImage() {
     document.getElementById('imageCanvas').toBlob(
         function (blob) {
@@ -119,6 +131,10 @@ function goToBlur() {
 function handleMouseDown(e) {
     e.preventDefault();
     e.stopPropagation();
+
+    var pos = getMousePos(canvas, e);
+    mouseX_start = pos.x;
+    mouseY_start = pos.y;
 
     holderCtx.save();
     holderCtx.clearRect(0, 0, holderCanvas.width, holderCanvas.height);
@@ -221,8 +237,24 @@ function handleMouseUp(e) {
 }
 
 function drawMousePath(mouseX, mouseY) {
-    interpolatePath(ctx, lastPos.x, lastPos.y, mouseX, mouseY, brushSize);
-    interpolatePath(tempCtx, lastPos.x, lastPos.y, mouseX, mouseY, brushSize);
+    switch(brush){
+		case 'round':
+			interpolatePath(ctx, lastPos.x, lastPos.y, mouseX, mouseY, brushSize);
+    		interpolatePath(tempCtx, lastPos.x, lastPos.y, mouseX, mouseY, brushSize);
+			break;
+		case 'area':
+	        ctx.beginPath();
+	        var width = mouseX-mouseX_start;
+	        var height = mouseY-mouseY_start;
+	        ctx.rect(mouseX_start,mouseY_start,width,height);
+	        ctx.strokeStyle = 'black';
+	        ctx.lineWidth = 10;
+	        ctx.stroke();
+			break;
+		default:
+			//this means that brush had either no value or an unlisted value, which should never happen
+			console.log('brush switch error')
+	}
 }
 
 function interpolatePath(pathCtx, x1, y1, x2, y2, r) {
