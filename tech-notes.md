@@ -28,6 +28,7 @@ When you click or tap on the canvas:
     1. The mouse/touch position is saved as `lastPos`.
 1. **On mouse/touch move:**
     1. A circle is drawn at each point to the `imageCanvas` and `tempCanvas`.
+    1. A [rectangle is interpolated](https://github.com/everestpipkin/image-scrubber/issues/38) between the new position and `lastPos`.
     1. The mouse/touch position is saved as `lastPos`.
 1. **On mouse/tap end (or the cursor leaving the canvas):**
     1. *If the user is painting a solid color:*
