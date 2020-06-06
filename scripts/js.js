@@ -214,7 +214,7 @@ function handleMouseUp(e) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(tempCanvas, 0, 0);
         ctx.globalCompositeOperation = 'destination-over';
-        ctx.drawImage(holderCnvas, 0, 0);
+        ctx.drawImage(holderCanvas, 0, 0);
         ctx.restore();
         blurAmount = tempBlurAmount;
     }
