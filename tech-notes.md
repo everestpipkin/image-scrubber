@@ -47,5 +47,3 @@ When you click or tap on the canvas:
 When you select "Rotate Image":
     
     1. `imageCanvas`, `tempCanvas`, `rotationCanvas`, `blurredCanvas` are resized, translated, and rotated.
-
-**TODO:** It doesn't look like `rotationCanvas` ever receives any actual image data. Is this the case? If so, remove `rotationCanvas`?
