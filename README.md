@@ -12,10 +12,10 @@ You can use the tool [here](https://everestpipkin.github.io/image-scrubber/).
 You can also install the tool as a mobile app.
 
 * **iOS:**
-    * Go to the link above in Safari and tap the Share button.
-    ![Screenshot of the app highlighting the Share button.](/blob/master/images/share.png)
-    * Tap the "Add to Home Screen" button.
-    ![Screenshot of the app highlighting the Add to Home Screen button.](/blob/master/images/install.png)
+    * Go to the link above in Safari and tap the Share button.\
+    ![Screenshot of the app highlighting the Share button.](images/share.png)
+    * Tap the "Add to Home Screen" button.\
+    ![Screenshot of the app highlighting the Add to Home Screen button.](images/install.png)
 * **TODO: Android**
 
 
@@ -62,4 +62,4 @@ My code is still a bit of a mess but utility over cleanliness, will continue to 
 
 ## Tech notes
 
-See [this doc](/blob/master/tech-notes.md) for tech notes.        
+See [this doc](tech-notes.md) for tech notes.
