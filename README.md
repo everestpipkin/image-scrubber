@@ -13,14 +13,14 @@ You can also install the tool as a mobile app.
 
 * **iOS:**
     * Go to the link above in Safari and tap the Share button.
-    ![Screenshot of the app highlighting the Share button.](/blob/master/images/ios-share.png)
+    ![Screenshot of the app highlighting the Share button.](/images/ios-share.png)
     * Tap the "Add to Home Screen" button.
-    ![Screenshot of the app highlighting the Add to Home Screen button.](/blob/master/images/ios-install.png)
+    ![Screenshot of the app highlighting the Add to Home Screen button.](/images/ios-install.png)
 * **Android:**
 	* Open the Chrome menu with the three dots in the top right.
-	![Screenshot of the app highlighting the menu.](/blob/master/images/android-menu.jpg)
+	![Screenshot of the app highlighting the menu.](/images/android-menu.jpg)
 	* Tap the "Add to Home screen" button.
-	![Screenshot of the app highlightingthe Add to Home screen button.](/blob/master/images/android-add.jpg)
+	![Screenshot of the app highlightingthe Add to Home screen button.](/images/android-add.jpg)
 
 
 ## How to Use
