@@ -84,8 +84,10 @@ function onFileChange(e) {
 
             var biggerDimension = Math.max(canvas.width, canvas.height);
 
-            brushSize = 50 * (biggerDimension / brushAdjustment);
+            brushSize = (50 * biggerDimension) / brushAdjustment;
+            brushSizeDiv.value = 50;
             blurAmount = scale(brushSize, 10, 157, 20, 150);
+            blurAmountDiv.value = blurAmount;
             setCursor();
         };
         img.src = event.target.result;

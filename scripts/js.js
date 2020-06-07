@@ -44,7 +44,8 @@ var blurAmountDiv = document.getElementById('blurAmountSlider');
 blurAmountDiv.onchange = populateBlurAmount;
 
 function populateBrushSize() {
-    brushSize = Math.floor((this.value * canvas.width) / brushAdjustment);
+    var biggerDimension = Math.max(canvas.width, canvas.height);
+    brushSize = Math.floor((this.value * biggerDimension) / brushAdjustment);
     setCursor();
 }
 
