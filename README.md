@@ -5,6 +5,22 @@ Tool lives at : https://everestpipkin.github.io/image-scrubber/
 
 It will remove identifying metadata (Exif data) from photographs, and also allow you to selectively blur parts of the image to cover faces and other identifiable information. 
 
+## Installation
+
+You can use the tool [here](https://everestpipkin.github.io/image-scrubber/). 
+
+You can also install the tool as a mobile app.
+
+* **iOS:**
+    * Go to the link above in Safari and tap the Share button.
+    ![Screenshot of the app highlighting the Share button.](/blob/master/images/share.png)
+    * Tap the "Add to Home Screen" button.
+    ![Screenshot of the app highlighting the Add to Home Screen button.](/blob/master/images/install.png)
+* **TODO: Android**
+
+
+## How to Use
+
 Hit the open button to open a photograph. The program will display the data it is removing. 
 
 Click okay, and you can then save the scrubbed image by hitting save or right clicking on it and saving it. Maximum size is 2500x2500 pixels - larger images will be scaled down.
@@ -43,3 +59,7 @@ Thank you:
 * And to everyone who has contributed to this repository or filed a bug report.
 
 My code is still a bit of a mess but utility over cleanliness, will continue to fix up in the coming days after the more critical work is over.
+
+## Tech notes
+
+See [this doc](/blob/master/tech-notes.md) for tech notes.        
