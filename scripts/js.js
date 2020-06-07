@@ -57,18 +57,35 @@ function setCursor() {
     var scaleX = canvas.getBoundingClientRect().width / canvas.width;
     cursorCanvas.width = brushSize * 2 * scaleX;
     cursorCanvas.height = brushSize * 2 * scaleX;
-    var cursorCtx = cursorCanvas.getContext('2d');
 
+    // two cursors – for visibility against dark backgrounds
+    var cursorCtx = cursorCanvas.getContext('2d');
+    var outlineCtx = cursorCanvas.getContext('2d');
+
+    cursorCtx.strokeStyle = '#000000';
     cursorCtx.beginPath();
     cursorCtx.arc(
         cursorCanvas.width / 2,
         cursorCanvas.height / 2,
-        brushSize * scaleX,
+        brushSize * scaleX - 2,
         0,
         Math.PI * 2
     );
     cursorCtx.closePath();
     cursorCtx.stroke();
+
+    outlineCtx.strokeStyle = '#ffffff';
+    outlineCtx.beginPath();
+    outlineCtx.arc(
+        cursorCanvas.width / 2,
+        cursorCanvas.height / 2,
+        brushSize * scaleX - 1,
+        0,
+        Math.PI * 2
+    );
+    outlineCtx.closePath();
+    outlineCtx.stroke();
+
     var cursorDataURL = cursorCanvas.toDataURL();
     canvas.style.cursor =
         'url(' +
