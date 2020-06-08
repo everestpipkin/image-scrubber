@@ -50,7 +50,8 @@ function populateBrushSize() {
 	if(brush == 'area'){
 		canvas.style.cursor = 'crosshair';
 	} else {
-		brushSize = Math.floor((this.value * canvas.width) / brushAdjustment);
+    	var biggerDimension = Math.max(canvas.width, canvas.height);
+    	brushSize = Math.floor((this.value * biggerDimension) / brushAdjustment);
     	setCursor();
 	}
 }
@@ -66,16 +67,31 @@ function setCursor() {
     cursorCanvas.height = brushSize * 2 * scaleX;
     var cursorCtx = cursorCanvas.getContext('2d');
 
+    cursorCtx.strokeStyle = '#000000';
     cursorCtx.beginPath();
     cursorCtx.arc(
         cursorCanvas.width / 2,
         cursorCanvas.height / 2,
-        brushSize * scaleX,
+        brushSize * scaleX - 2,
         0,
         Math.PI * 2
     );
     cursorCtx.closePath();
     cursorCtx.stroke();
+
+     // for visibility against dark backgrounds
+    cursorCtx.strokeStyle = '#ffffff';
+    cursorCtx.beginPath();
+    cursorCtx.arc(
+        cursorCanvas.width / 2,
+        cursorCanvas.height / 2,
+        brushSize * scaleX - 1,
+        0,
+        Math.PI * 2
+    );
+    cursorCtx.closePath();
+    cursorCtx.stroke();
+
     var cursorDataURL = cursorCanvas.toDataURL();
     canvas.style.cursor =
         'url(' +
@@ -115,11 +131,11 @@ function saveImage() {
             var nameWithoutPath = filename.replace(/.*[\\/]([^\\/]+)$/, '$1');
             var nameWithoutExtension = nameWithoutPath.replace(/\.[^.]*$/, '');
 
-            link.download = nameWithoutExtension + '_scrubbed.jpg';
+            link.download = nameWithoutExtension + '_scrubbed.png';
             link.href = URL.createObjectURL(blob);
             link.click();
         },
-        'image/jpeg',
+        'image/png',
         0.8
     );
 }
