@@ -248,15 +248,8 @@ function drawMousePath(mouseX, mouseY) {
     		interpolatePath(tempCtx, lastPos.x, lastPos.y, mouseX, mouseY, brushSize);
 			break;
 		case 'area':
-			tempCtx.clearRect(0, 0, canvas.width, canvas.height);
-	        tempCtx.beginPath();
-	        var width = mouseX-mouseX_start;
-	        var height = mouseY-mouseY_start;
-	        tempCtx.rect(mouseX_start,mouseY_start,width,height);
-	        tempCtx.strokeStyle = 'black';
-	        tempCtx.lineWidth = 10;
-	        tempCtx.stroke();
-			tempCtx.fill();
+			areaDraw(ctx, mouseX, mouseY);
+			areaDraw(tempCtx, mouseX, mouseY);
 			break;
 		default:
 			//this means that brush had either no value or an unlisted value, which should never happen
@@ -278,6 +271,23 @@ function interpolatePath(pathCtx, x1, y1, x2, y2, r) {
     pathCtx.arc(x2, y2, r, 0, Math.PI * 2);
     pathCtx.closePath();
     pathCtx.fill();
+}
+
+function areaDraw(pathCtx, mouseX, mouseY){
+	//clear any previous drawings
+	pathCtx.clearRect(0, 0, canvas.width, canvas.height);
+	pathCtx.beginPath();
+	
+	//calculate width and height of rectangle based on start posisions and current positions
+	var width = mouseX-mouseX_start;
+	var height = mouseY-mouseY_start;
+	
+	//draw current rectangle
+	pathCtx.rect(mouseX_start,mouseY_start,width,height);
+	pathCtx.strokeStyle = 'black';
+	pathCtx.lineWidth = 10;
+	pathCtx.stroke();
+	pathCtx.fill();
 }
 
 function getMousePos(canvas, evt) {
