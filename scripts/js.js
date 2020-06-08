@@ -47,8 +47,12 @@ var blurAmountDiv = document.getElementById('blurAmountSlider');
 blurAmountDiv.onchange = populateBlurAmount;
 
 function populateBrushSize() {
-    brushSize = Math.floor((this.value * canvas.width) / brushAdjustment);
-    setCursor();
+	if(brush == 'area'){
+		canvas.style.cursor = 'crosshair';
+	} else {
+		brushSize = Math.floor((this.value * canvas.width) / brushAdjustment);
+    	setCursor();
+	}
 }
 
 function populateBlurAmount() {
@@ -99,6 +103,7 @@ var bl = document.forms['brushForm'].elements['useBrush'];
 for (var i = 0, len = bl.length; i < len; i++) {
     bl[i].onclick = function () {
         brush = this.value;
+		populateBrushSize();
     };
 }
 
