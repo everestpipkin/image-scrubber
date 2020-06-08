@@ -3,7 +3,7 @@ var img;
 
 var isDown = false;
 var painting = false;
-var brush = false;
+var brush = "round"; //default to round brush at start
 var mouseX_start;
 var mouseY_start;
 var lastPos;
@@ -243,13 +243,15 @@ function drawMousePath(mouseX, mouseY) {
     		interpolatePath(tempCtx, lastPos.x, lastPos.y, mouseX, mouseY, brushSize);
 			break;
 		case 'area':
-	        ctx.beginPath();
+			tempCtx.clearRect(0, 0, canvas.width, canvas.height);
+	        tempCtx.beginPath();
 	        var width = mouseX-mouseX_start;
 	        var height = mouseY-mouseY_start;
-	        ctx.rect(mouseX_start,mouseY_start,width,height);
-	        ctx.strokeStyle = 'black';
-	        ctx.lineWidth = 10;
-	        ctx.stroke();
+	        tempCtx.rect(mouseX_start,mouseY_start,width,height);
+	        tempCtx.strokeStyle = 'black';
+	        tempCtx.lineWidth = 10;
+	        tempCtx.stroke();
+			tempCtx.fill();
 			break;
 		default:
 			//this means that brush had either no value or an unlisted value, which should never happen
