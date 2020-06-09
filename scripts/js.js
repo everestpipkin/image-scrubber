@@ -1,5 +1,6 @@
 var filename;
 var img;
+var canvasScale;
 
 var isDown = false;
 var painting = false;
@@ -47,13 +48,9 @@ var blurAmountDiv = document.getElementById('blurAmountSlider');
 blurAmountDiv.onchange = populateBlurAmount;
 
 function populateBrushSize() {
-	if(brush == 'area'){
-		canvas.style.cursor = 'crosshair';
-	} else {
-    	var biggerDimension = Math.max(canvas.width, canvas.height);
-    	brushSize = Math.floor((this.value * biggerDimension) / brushAdjustment);
-    	setCursor();
-	}
+    var biggerDimension = Math.max(canvas.width, canvas.height);
+    brushSize = Math.floor((this.value * biggerDimension) / brushAdjustment);
+    setCursor();
 }
 
 function populateBlurAmount() {
@@ -61,46 +58,50 @@ function populateBlurAmount() {
 }
 
 function setCursor() {
-    var cursorCanvas = document.createElement('canvas');
-    var scaleX = canvas.getBoundingClientRect().width / canvas.width;
-    cursorCanvas.width = brushSize * 2 * scaleX;
-    cursorCanvas.height = brushSize * 2 * scaleX;
-    var cursorCtx = cursorCanvas.getContext('2d');
-
-    cursorCtx.strokeStyle = '#000000';
-    cursorCtx.beginPath();
-    cursorCtx.arc(
-        cursorCanvas.width / 2,
-        cursorCanvas.height / 2,
-        brushSize * scaleX - 2,
-        0,
-        Math.PI * 2
-    );
-    cursorCtx.closePath();
-    cursorCtx.stroke();
-
-     // for visibility against dark backgrounds
-    cursorCtx.strokeStyle = '#ffffff';
-    cursorCtx.beginPath();
-    cursorCtx.arc(
-        cursorCanvas.width / 2,
-        cursorCanvas.height / 2,
-        brushSize * scaleX - 1,
-        0,
-        Math.PI * 2
-    );
-    cursorCtx.closePath();
-    cursorCtx.stroke();
-
-    var cursorDataURL = cursorCanvas.toDataURL();
-    canvas.style.cursor =
-        'url(' +
-        cursorDataURL +
-        ') ' +
-        cursorCanvas.width / 2 +
-        ' ' +
-        cursorCanvas.height / 2 +
-        ', auto';
+	if(brush == 'area'){
+		canvas.style.cursor = 'crosshair';
+	} else {	
+	    var cursorCanvas = document.createElement('canvas');
+	    var scaleX = canvas.getBoundingClientRect().width / canvas.width;
+	    cursorCanvas.width = brushSize * 2 * scaleX;
+	    cursorCanvas.height = brushSize * 2 * scaleX;
+	    var cursorCtx = cursorCanvas.getContext('2d');
+	
+	    cursorCtx.strokeStyle = '#000000';
+	    cursorCtx.beginPath();
+	    cursorCtx.arc(
+	        cursorCanvas.width / 2,
+	        cursorCanvas.height / 2,
+	        brushSize * scaleX - 2,
+	        0,
+	        Math.PI * 2
+	    );
+	    cursorCtx.closePath();
+	    cursorCtx.stroke();
+	
+	     // for visibility against dark backgrounds
+	    cursorCtx.strokeStyle = '#ffffff';
+	    cursorCtx.beginPath();
+	    cursorCtx.arc(
+	        cursorCanvas.width / 2,
+	        cursorCanvas.height / 2,
+	        brushSize * scaleX - 1,
+	        0,
+	        Math.PI * 2
+	    );
+	    cursorCtx.closePath();
+	    cursorCtx.stroke();
+	
+	    var cursorDataURL = cursorCanvas.toDataURL();
+	    canvas.style.cursor =
+	        'url(' +
+	        cursorDataURL +
+	        ') ' +
+	        cursorCanvas.width / 2 +
+	        ' ' +
+	        cursorCanvas.height / 2 +
+	        ', auto';
+	}
 }
 
 // get list of radio buttons with name 'paintForm'
@@ -264,8 +265,8 @@ function drawMousePath(mouseX, mouseY) {
     		interpolatePath(tempCtx, lastPos.x, lastPos.y, mouseX, mouseY, brushSize);
 			break;
 		case 'area':
-			areaDraw(ctx, mouseX, mouseY);
-			areaDraw(tempCtx, mouseX, mouseY);
+			areaDraw(ctx, mouseX, mouseY, true);
+			areaDraw(tempCtx, mouseX, mouseY, false);
 			break;
 		default:
 			//this means that brush had either no value or an unlisted value, which should never happen
@@ -289,9 +290,14 @@ function interpolatePath(pathCtx, x1, y1, x2, y2, r) {
     pathCtx.fill();
 }
 
-function areaDraw(pathCtx, mouseX, mouseY){
-	//clear any previous drawings
+function areaDraw(pathCtx, mouseX, mouseY, redraw){
+	//clear any previous drawings and restore image
 	pathCtx.clearRect(0, 0, canvas.width, canvas.height);
+	
+	//determines if we need to redraw image after clearing canvas
+	if(redraw){
+		pathCtx.drawImage(img, 0, 0, img.width * canvasScale, img.height * canvasScale );
+	}
 	pathCtx.beginPath();
 	
 	//calculate width and height of rectangle based on start posisions and current positions
