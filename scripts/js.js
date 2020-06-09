@@ -191,7 +191,7 @@ function handleMouseMove(e) {
     lastPos = pos;
 }
 
-function handleTouchStart(e) {
+function handleTouchStart(e) { //added to properly handle start point for area draw
     if (e.touches.length > 1) {
         // Ignore multi touch events
         return;
@@ -324,7 +324,7 @@ function areaDraw(pathCtx, mouseX, mouseY, redraw){
 	
 	//determines if we need to redraw image after clearing canvas
 	if(redraw){
-		pathCtx.drawImage(img, 0, 0, img.width * canvasScale, img.height * canvasScale );
+		pathCtx.drawImage(holderCanvas, 0, 0);
 	}
 	pathCtx.beginPath();
 	
