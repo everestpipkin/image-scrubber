@@ -58,9 +58,9 @@ function onFileChange(e) {
         img = new Image();
         img.onload = function () {
             if (img.width < 2500 && img.height < 2500) {
-                var canvasScale = 1;
+                canvasScale = 1;
             } else {
-                var canvasScale = Math.min(2500 / img.width, 2500 / img.height);
+                canvasScale = Math.min(2500 / img.width, 2500 / img.height);
             }
 
             canvas.width = tempCanvas.width = holderCanvas.width = rotationCanvas.width = blurredCanvas.width =

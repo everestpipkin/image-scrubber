@@ -1,8 +1,12 @@
 var filename;
 var img;
+var canvasScale;
 
 var isDown = false;
 var painting = false;
+var brush = "round"; //default to round brush at start
+var mouseX_start;
+var mouseY_start;
 var lastPos;
 
 var canvas = document.getElementById('imageCanvas');
@@ -32,7 +36,7 @@ canvas.addEventListener('mousemove', handleMouseMove);
 canvas.addEventListener('mouseup', handleMouseUp);
 canvas.addEventListener('mouseout', handleMouseOut);
 
-canvas.addEventListener('touchstart', handleMouseDown);
+canvas.addEventListener('touchstart', handleTouchStart);
 canvas.addEventListener('touchmove', handleTouchMove);
 canvas.addEventListener('touchend', handleMouseUp);
 canvas.addEventListener('touchcancel', handleMouseUp);
@@ -54,46 +58,50 @@ function populateBlurAmount() {
 }
 
 function setCursor() {
-    var cursorCanvas = document.createElement('canvas');
-    var scaleX = canvas.getBoundingClientRect().width / canvas.width;
-    cursorCanvas.width = brushSize * 2 * scaleX;
-    cursorCanvas.height = brushSize * 2 * scaleX;
-    var cursorCtx = cursorCanvas.getContext('2d');
-
-    cursorCtx.strokeStyle = '#000000';
-    cursorCtx.beginPath();
-    cursorCtx.arc(
-        cursorCanvas.width / 2,
-        cursorCanvas.height / 2,
-        brushSize * scaleX - 2,
-        0,
-        Math.PI * 2
-    );
-    cursorCtx.closePath();
-    cursorCtx.stroke();
-
-     // for visibility against dark backgrounds
-    cursorCtx.strokeStyle = '#ffffff';
-    cursorCtx.beginPath();
-    cursorCtx.arc(
-        cursorCanvas.width / 2,
-        cursorCanvas.height / 2,
-        brushSize * scaleX - 1,
-        0,
-        Math.PI * 2
-    );
-    cursorCtx.closePath();
-    cursorCtx.stroke();
-
-    var cursorDataURL = cursorCanvas.toDataURL();
-    canvas.style.cursor =
-        'url(' +
-        cursorDataURL +
-        ') ' +
-        cursorCanvas.width / 2 +
-        ' ' +
-        cursorCanvas.height / 2 +
-        ', auto';
+	if(brush == 'area'){
+		canvas.style.cursor = 'crosshair';
+	} else {	
+	    var cursorCanvas = document.createElement('canvas');
+	    var scaleX = canvas.getBoundingClientRect().width / canvas.width;
+	    cursorCanvas.width = brushSize * 2 * scaleX;
+	    cursorCanvas.height = brushSize * 2 * scaleX;
+	    var cursorCtx = cursorCanvas.getContext('2d');
+	
+	    cursorCtx.strokeStyle = '#000000';
+	    cursorCtx.beginPath();
+	    cursorCtx.arc(
+	        cursorCanvas.width / 2,
+	        cursorCanvas.height / 2,
+	        brushSize * scaleX - 2,
+	        0,
+	        Math.PI * 2
+	    );
+	    cursorCtx.closePath();
+	    cursorCtx.stroke();
+	
+	     // for visibility against dark backgrounds
+	    cursorCtx.strokeStyle = '#ffffff';
+	    cursorCtx.beginPath();
+	    cursorCtx.arc(
+	        cursorCanvas.width / 2,
+	        cursorCanvas.height / 2,
+	        brushSize * scaleX - 1,
+	        0,
+	        Math.PI * 2
+	    );
+	    cursorCtx.closePath();
+	    cursorCtx.stroke();
+	
+	    var cursorDataURL = cursorCanvas.toDataURL();
+	    canvas.style.cursor =
+	        'url(' +
+	        cursorDataURL +
+	        ') ' +
+	        cursorCanvas.width / 2 +
+	        ' ' +
+	        cursorCanvas.height / 2 +
+	        ', auto';
+	}
 }
 
 // get list of radio buttons with name 'paintForm'
@@ -103,6 +111,16 @@ var sz = document.forms['paintForm'].elements['paintingAction'];
 for (var i = 0, len = sz.length; i < len; i++) {
     sz[i].onclick = function () {
         painting = this.value;
+    };
+}
+
+// same as above, but for 'useBrush' options
+var bl = document.forms['brushForm'].elements['useBrush'];
+
+for (var i = 0, len = bl.length; i < len; i++) {
+    bl[i].onclick = function () {
+        brush = this.value;
+		populateBrushSize();
     };
 }
 
@@ -135,6 +153,10 @@ function goToBlur() {
 function handleMouseDown(e) {
     e.preventDefault();
     e.stopPropagation();
+
+    var pos = getMousePos(canvas, e);
+    mouseX_start = pos.x;
+    mouseY_start = pos.y;
 
     holderCtx.save();
     holderCtx.clearRect(0, 0, holderCanvas.width, holderCanvas.height);
@@ -169,6 +191,32 @@ function handleMouseMove(e) {
     lastPos = pos;
 }
 
+function handleTouchStart(e) { //added to properly handle start point for area draw
+    if (e.touches.length > 1) {
+        // Ignore multi touch events
+        return;
+    }
+
+    touch = event.changedTouches[0]; // get the position information
+	
+	
+	
+    var mouseEvent = new MouseEvent( // create event
+        'mousedown', // type of event
+        {
+            view: event.target.ownerDocument.defaultView,
+            bubbles: true,
+            cancelable: true,
+            screenX: touch.screenX, // get the touch coords
+            screenY: touch.screenY, // and add them to the
+            clientX: touch.clientX, // mouse event
+            clientY: touch.clientY,
+        }
+    );
+    // send it to the same target as the touch event contact point.
+    touch.target.dispatchEvent(mouseEvent);
+}
+
 function handleTouchMove(e) {
     if (e.touches.length > 1) {
         // Ignore multi touch events
@@ -176,7 +224,9 @@ function handleTouchMove(e) {
     }
 
     touch = event.changedTouches[0]; // get the position information
-
+	
+	
+	
     var mouseEvent = new MouseEvent( // create event
         'mousemove', // type of event
         {
@@ -237,8 +287,19 @@ function handleMouseUp(e) {
 }
 
 function drawMousePath(mouseX, mouseY) {
-    interpolatePath(ctx, lastPos.x, lastPos.y, mouseX, mouseY, brushSize);
-    interpolatePath(tempCtx, lastPos.x, lastPos.y, mouseX, mouseY, brushSize);
+    switch(brush){
+		case 'round':
+			interpolatePath(ctx, lastPos.x, lastPos.y, mouseX, mouseY, brushSize);
+    		interpolatePath(tempCtx, lastPos.x, lastPos.y, mouseX, mouseY, brushSize);
+			break;
+		case 'area':
+			areaDraw(ctx, mouseX, mouseY, true);
+			areaDraw(tempCtx, mouseX, mouseY, false);
+			break;
+		default:
+			//this means that brush had either no value or an unlisted value, which should never happen
+			console.log('brush switch error')
+	}
 }
 
 function interpolatePath(pathCtx, x1, y1, x2, y2, r) {
@@ -255,6 +316,28 @@ function interpolatePath(pathCtx, x1, y1, x2, y2, r) {
     pathCtx.arc(x2, y2, r, 0, Math.PI * 2);
     pathCtx.closePath();
     pathCtx.fill();
+}
+
+function areaDraw(pathCtx, mouseX, mouseY, redraw){
+	//clear any previous drawings and restore image
+	pathCtx.clearRect(0, 0, canvas.width, canvas.height);
+	
+	//determines if we need to redraw image after clearing canvas
+	if(redraw){
+		pathCtx.drawImage(holderCanvas, 0, 0);
+	}
+	pathCtx.beginPath();
+	
+	//calculate width and height of rectangle based on start posisions and current positions
+	var width = mouseX-mouseX_start;
+	var height = mouseY-mouseY_start;
+	
+	//draw current rectangle
+	pathCtx.rect(mouseX_start,mouseY_start,width,height);
+	pathCtx.strokeStyle = 'black';
+	pathCtx.lineWidth = 10;
+	pathCtx.stroke();
+	pathCtx.fill();
 }
 
 function getMousePos(canvas, evt) {
