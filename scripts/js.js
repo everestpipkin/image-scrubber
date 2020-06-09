@@ -49,7 +49,7 @@ blurAmountDiv.onchange = populateBlurAmount;
 
 function populateBrushSize() {
     var biggerDimension = Math.max(canvas.width, canvas.height);
-    brushSize = Math.floor((this.value * biggerDimension) / brushAdjustment);
+    brushSize = Math.floor((document.getElementById('brushSizeSlider').value * biggerDimension) / brushAdjustment);
     setCursor();
 }
 
@@ -192,6 +192,9 @@ function handleMouseMove(e) {
 }
 
 function handleTouchStart(e) { //added to properly handle start point for area draw
+    e.preventDefault();
+    e.stopPropagation();
+
     if (e.touches.length > 1) {
         // Ignore multi touch events
         return;
