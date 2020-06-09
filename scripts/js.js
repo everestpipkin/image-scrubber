@@ -36,7 +36,7 @@ canvas.addEventListener('mousemove', handleMouseMove);
 canvas.addEventListener('mouseup', handleMouseUp);
 canvas.addEventListener('mouseout', handleMouseOut);
 
-canvas.addEventListener('touchstart', handleMouseDown);
+canvas.addEventListener('touchstart', handleTouchStart);
 canvas.addEventListener('touchmove', handleTouchMove);
 canvas.addEventListener('touchend', handleMouseUp);
 canvas.addEventListener('touchcancel', handleMouseUp);
@@ -191,6 +191,32 @@ function handleMouseMove(e) {
     lastPos = pos;
 }
 
+function handleTouchStart(e) {
+    if (e.touches.length > 1) {
+        // Ignore multi touch events
+        return;
+    }
+
+    touch = event.changedTouches[0]; // get the position information
+	
+	
+	
+    var mouseEvent = new MouseEvent( // create event
+        'mousedown', // type of event
+        {
+            view: event.target.ownerDocument.defaultView,
+            bubbles: true,
+            cancelable: true,
+            screenX: touch.screenX, // get the touch coords
+            screenY: touch.screenY, // and add them to the
+            clientX: touch.clientX, // mouse event
+            clientY: touch.clientY,
+        }
+    );
+    // send it to the same target as the touch event contact point.
+    touch.target.dispatchEvent(mouseEvent);
+}
+
 function handleTouchMove(e) {
     if (e.touches.length > 1) {
         // Ignore multi touch events
@@ -198,7 +224,9 @@ function handleTouchMove(e) {
     }
 
     touch = event.changedTouches[0]; // get the position information
-
+	
+	
+	
     var mouseEvent = new MouseEvent( // create event
         'mousemove', // type of event
         {
