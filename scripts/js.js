@@ -5,6 +5,7 @@ var canvasScale;
 var isDown = false;
 var painting = false;
 var brush = "round"; //default to round brush at start
+var paintColor = "#000";
 var mouseX_start;
 var mouseY_start;
 var lastPos;
@@ -47,6 +48,8 @@ brushSizeDiv.onchange = populateBrushSize;
 var blurAmountDiv = document.getElementById('blurAmountSlider');
 blurAmountDiv.onchange = populateBlurAmount;
 
+var paintColorForm = document.getElementById("paintColor");
+
 function populateBrushSize() {
     var biggerDimension = Math.max(canvas.width, canvas.height);
     brushSize = Math.floor((document.getElementById('brushSizeSlider').value * biggerDimension) / brushAdjustment);
@@ -56,6 +59,7 @@ function populateBrushSize() {
 function populateBlurAmount() {
     blurAmount = Math.floor(this.value);
 }
+
 
 function setCursor() {
 	if(brush == 'area'){
@@ -105,20 +109,33 @@ function setCursor() {
 }
 
 // get list of radio buttons with name 'paintForm'
-var sz = document.forms['paintForm'].elements['paintingAction'];
+var paintFormElements = document.forms['paintForm'].elements['paintingAction'];
 
 // loop through list
-for (var i = 0, len = sz.length; i < len; i++) {
-    sz[i].onclick = function () {
+for (var i = 0, len = paintFormElements.length; i < len; i++) {
+    if (paintFormElements[i].value == "blur"){
+        paintFormElements[i].checked = true;
+    }
+    paintFormElements[i].onclick = function () {
         painting = this.value;
     };
 }
 
-// same as above, but for 'useBrush' options
-var bl = document.forms['brushForm'].elements['useBrush'];
+var paintColorButton = document.getElementById("paintColor");
+paintColorButton.onclick = function () {
+        document.getElementById("Paint").checked = true;
+        painting = "paint";
+    };
 
-for (var i = 0, len = bl.length; i < len; i++) {
-    bl[i].onclick = function () {
+// same as above, but for 'useBrush' options
+var brushFormElements = document.forms['brushForm'].elements['useBrush'];
+
+for (var i = 0, len = brushFormElements.length; i < len; i++) {
+
+    if (brushFormElements[i].value == "round"){
+        brushFormElements[i].checked = true;
+    }
+    brushFormElements[i].onclick = function () {
         brush = this.value;
 		populateBrushSize();
     };
@@ -166,6 +183,10 @@ function handleMouseDown(e) {
     tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
     isDown = true;
     lastPos = getMousePos(canvas, e);
+    if (brush == "tap"){
+        handleMouseMove(e);
+    }
+
 }
 
 function handleMouseOut(e) {
@@ -218,6 +239,7 @@ function handleTouchStart(e) { //added to properly handle start point for area d
     );
     // send it to the same target as the touch event contact point.
     touch.target.dispatchEvent(mouseEvent);
+
 }
 
 function handleTouchMove(e) {
@@ -290,6 +312,15 @@ function handleMouseUp(e) {
 }
 
 function drawMousePath(mouseX, mouseY) {
+        if (painting == 'undo') {
+            paintColor = "#ffffff"
+        }
+        if (painting == 'blur') {
+            paintColor = "#000000"
+        }
+        else if (painting == 'paint') {
+            paintColor = (paintColorForm.style.backgroundColor)// change to color
+        }
     switch(brush){
 		case 'round':
 			interpolatePath(ctx, lastPos.x, lastPos.y, mouseX, mouseY, brushSize);
@@ -299,6 +330,10 @@ function drawMousePath(mouseX, mouseY) {
 			areaDraw(ctx, mouseX, mouseY, true);
 			areaDraw(tempCtx, mouseX, mouseY, false);
 			break;
+        case 'tap':
+            tapDraw(ctx, mouseX, mouseY, brushSize);
+            tapDraw(tempCtx, mouseX, mouseY, brushSize);
+            break;
 		default:
 			//this means that brush had either no value or an unlisted value, which should never happen
 			console.log('brush switch error')
@@ -306,6 +341,10 @@ function drawMousePath(mouseX, mouseY) {
 }
 
 function interpolatePath(pathCtx, x1, y1, x2, y2, r) {
+
+    pathCtx.strokeStyle = paintColor;
+    pathCtx.fillStyle = paintColor;
+
     // Draw rectangle from last point
     pathCtx.beginPath();
     pathCtx.moveTo(x1,y1);
@@ -321,7 +360,21 @@ function interpolatePath(pathCtx, x1, y1, x2, y2, r) {
     pathCtx.fill();
 }
 
+
+function tapDraw(pathCtx, mouseX, mouseY, r) {
+
+    pathCtx.strokeStyle = paintColor;
+    pathCtx.fillStyle = paintColor;
+
+    // Draw the circle at the end
+    pathCtx.beginPath();
+    pathCtx.arc(mouseX, mouseY, r, 0, Math.PI * 2);
+    pathCtx.closePath();
+    pathCtx.fill();
+}
+
 function areaDraw(pathCtx, mouseX, mouseY, redraw){
+
 	//clear any previous drawings and restore image
 	pathCtx.clearRect(0, 0, canvas.width, canvas.height);
 	
@@ -337,7 +390,8 @@ function areaDraw(pathCtx, mouseX, mouseY, redraw){
 	
 	//draw current rectangle
 	pathCtx.rect(mouseX_start,mouseY_start,width,height);
-	pathCtx.strokeStyle = 'black';
+	pathCtx.strokeStyle = paintColor;
+    pathCtx.fillStyle = paintColor;
 	pathCtx.lineWidth = 10;
 	pathCtx.stroke();
 	pathCtx.fill();

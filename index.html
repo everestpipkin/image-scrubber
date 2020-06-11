@@ -72,7 +72,7 @@
                         name="paintingAction"
                         value="paint"
                     />
-                    <label for="Paint">Paint</label><br />
+                    <label for="Paint">Paint</label>&nbsp;<button data-jscolor="{valueElement:null,value:'000000'}" id="paintColor" style="width:20px; height:20px;"></button><br />
                     <input
                         type="radio"
                         id="Blur"
@@ -92,16 +92,25 @@
             </div>
             <div id="brushType" class="topBarDiv">
                 <form id="brushForm">
-                     <input type="radio"
-                            id="Area"
-                            name="useBrush"
-                            value="area">
-                     <label for="Area">Rectangle</label><br>
+
                      <input type="radio"
                             id="Round"
                             name="useBrush"
                             value="round" checked>
                      <label for="Round">Brush&nbsp;</label><br>
+
+                    <input type="radio"
+                            id="Area"
+                            name="useBrush"
+                            value="area">
+                     <label for="Area">Rectangle</label><br>
+
+                     <input type="radio"
+                            id="Tap"
+                            name="useBrush"
+                            value="tap">
+                     <label for="Tap">Tap&nbsp;</label><br>
+
                 </form>
             </div>
             <div id="brushSizeDiv" class="topBarDiv">
@@ -166,9 +175,11 @@ If you want other ways to cover your digital footprint, I've assembled a list of
         <canvas id="blurredCanvas"></canvas>
         <canvas id="offscreenCanvas"></canvas>
 
+        <script type="text/javascript" src="scripts/jscolor.js"></script>
         <script type="text/javascript" src="scripts/exif.js"></script>
         <script type="text/javascript" src="scripts/openImage.js"></script>
         <script type="text/javascript" src="scripts/stackblur.js"></script>
         <script type="text/javascript" src="scripts/js.js"></script>
+
     </body>
 </html>

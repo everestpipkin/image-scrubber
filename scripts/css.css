@@ -9,6 +9,10 @@
     cursor: crosshair;
 }
 
+#paintColor{
+    width: 30%;
+}
+
 #drop-zone {
     position: fixed;
     top: 20px;
