@@ -39,7 +39,7 @@ The website works without an internet connection, and it's more secure to use th
 
 1. Turn on airplane mode after loading the page and before opening images - This way, no third-party services (like a browser extension or insecure wireless network) can transmit the images you upload. (Recommended for mobile)
 
-2. [Download](https://github.com/everestpipkin/image-scrubber/archive/master.zip) the tool from Github, and open index.html locally: This is the safest, but takes a little more effort and is harder to do on mobile.  By clicking the link, you will download a zip file containing all the files necessary to run this on your own system.  Extract, or unzip, the folder, and open the index.html file with a web browser of your choice, and use it using the instructions above.  Just to be safe, still turn off data/internet before opening any photos with the tool.
+2. [Download](https://github.com/everestpipkin/image-scrubber/archive/main.zip) the tool from Github, and open index.html locally: This is the safest, but takes a little more effort and is harder to do on mobile.  By clicking the link, you will download a zip file containing all the files necessary to run this on your own system.  Extract, or unzip, the folder, and open the index.html file with a web browser of your choice, and use it using the instructions above.  Just to be safe, still turn off data/internet before opening any photos with the tool.
 
 If you're a command-line whiz with git set up, you can clone this repository instead of downloading the zip.  The command to do so: 
 
