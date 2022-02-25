@@ -1,13 +1,15 @@
+NOTE: This repo is a translation of the origional Image Scruber website into Ukrainian
+
 # image-scrubber
 This is a tool for anonymizing photographs taken at protests. 
 
-Tool lives at : https://everestpipkin.github.io/image-scrubber/ 
+Tool lives at : https://noexif.xyz/ 
 
 It will remove identifying metadata (Exif data) from photographs, and also allow you to selectively blur parts of the image to cover faces and other identifiable information. 
 
 ## Installation
 
-You can use the tool [here](https://everestpipkin.github.io/image-scrubber/). 
+You can use the tool [here](https://noexif.xyz/). 
 
 You can also install the tool as a mobile app.
 
@@ -39,11 +41,11 @@ The website works without an internet connection, and it's more secure to use th
 
 1. Turn on airplane mode after loading the page and before opening images - This way, no third-party services (like a browser extension or insecure wireless network) can transmit the images you upload. (Recommended for mobile)
 
-2. [Download](https://github.com/everestpipkin/image-scrubber/archive/main.zip) the tool from Github, and open index.html locally: This is the safest, but takes a little more effort and is harder to do on mobile.  By clicking the link, you will download a zip file containing all the files necessary to run this on your own system.  Extract, or unzip, the folder, and open the index.html file with a web browser of your choice, and use it using the instructions above.  Just to be safe, still turn off data/internet before opening any photos with the tool.
+2. [Download](https://github.com/techniack/image-scrubber/archive/main.zip) the tool from Github, and open index.html locally: This is the safest, but takes a little more effort and is harder to do on mobile.  By clicking the link, you will download a zip file containing all the files necessary to run this on your own system.  Extract, or unzip, the folder, and open the index.html file with a web browser of your choice, and use it using the instructions above.  Just to be safe, still turn off data/internet before opening any photos with the tool.
 
 If you're a command-line whiz with git set up, you can clone this repository instead of downloading the zip.  The command to do so: 
 
-    git clone https://github.com/everestpipkin/image-scrubber
+    git clone https://github.com/techniack/image-scrubber
 
 ---
 
